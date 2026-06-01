@@ -1,10 +1,10 @@
 "use client";
 import { apiClient } from "@/app/lib/api";
 import { useApp } from "@/app/lib/AppContext";
-import AlertMessage from "@/app/toasts";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import toast from 'react-hot-toast';
 import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
 
 
 export default function ProductDetail(){
@@ -13,27 +13,21 @@ export default function ProductDetail(){
 
     const {products, loading, refreshProducts, refreshCount, user, fetchUserData, token} = useApp()
     const {register, handleSubmit, formState : {errors, isSubmitting}, reset} = useForm()
-    const [alertMessage, setAlertMessage] = useState('');
-    const [alertType, setAlertType] = useState(1);
+
 
     console.log('user before: ',user);
     console.log('rug_id', productid)
     console.log('rug_id', Number(productid))
     console.log('user_id', user?.rugs?.[0]?.id)
 
+
+
+
+    // start Handle Adding rugs to my wishlist
+
     const IsLikes = user?.rugs?.find((product) => product.id == productid)
                 ? true
                 : false;
-
-    useEffect(() => {
-        if (!alertMessage) return;
-
-        const timer = setTimeout(() => {
-            setAlertMessage('');
-        }, 3000);
-
-        return () => clearTimeout(timer);
-        }, [alertMessage]);
         
     const Onsubmits = async () => {
 
@@ -48,25 +42,62 @@ export default function ProductDetail(){
 
             if (resp.status === 200 || resp.status === 201) {
                 // alert('rug added seccessfully')
-                setAlertType(1);
-                setAlertMessage(resp.data.message)
-                console.log('alertType ',alertType)
-                console.log('alertMessage ',alertMessage)
                 await fetchUserData()
                 await refreshProducts()
+                toast.success(resp.data.message || 'Wishlist updated');
             }
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
-            setAlertType(3)
-            setAlertMessage(error.response?.data?.message || error.message || 'Something went wrong');
-                            console.log('alertType ',alertType)
-                console.log('alertMessage ',alertMessage)
+            toast.error(error.response?.data?.message || error.message || 'Something went wrong');
             console.error('Connection Error:', errorMessage);
             console.log("STATUS:", error.response?.status);
             console.log("DATA:", error.response?.data);
             console.log("FULL ERROR:", error);
         }
     }
+
+    // end Handle Adding rugs to my wishlist
+
+
+
+    // start Handle Adding rugs to cart
+
+    const [RugQnt, setRugQnt] = useState(1)
+
+    useEffect(() => {
+        console.log('RugQnt: ',RugQnt)
+    },[RugQnt]);
+
+    const HandleAddCart = async () => {
+        const dataForm = new FormData();
+        
+        try {
+            dataForm.append('rug_id', productid);
+            dataForm.append('rug_Quantity', RugQnt);
+
+            const resp = await apiClient.post('/addcartrug', dataForm, {
+                headers: {Authorization: token}
+            });
+
+            if (resp.status === 200 || resp.status === 201) {
+                // alert('rug added seccessfully')
+                await fetchUserData()
+                await refreshProducts()
+                toast.success(resp.data.message || 'Rug Added to your cart seccessfully');
+            }
+            
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message;
+            toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+            console.error('Connection Error:', errorMessage);
+            console.log("STATUS:", error.response?.status);
+            console.log("DATA:", error.response?.data);
+            console.log("FULL ERROR:", error);
+        }
+    }
+
+    // end Handle Adding rugs to cart
+
 
     console.log('product: ',products)
 
@@ -141,6 +172,37 @@ export default function ProductDetail(){
                                 </div>
                             </div>
 
+                            <div className="w-full">
+                        
+                                <div className="flex items-center">
+                                    <button
+                                    type="button"
+                                    disabled={ RugQnt <= 1 }
+                                    onClick={() => setRugQnt((prev) => prev + 1)}
+                                    className="px-4 py-3 bg-[#7B542F] text-white hover:bg-[#5a3e24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    aria-label="Decrement button"
+                                    >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>
+                                    </button>
+                                    <input
+                                    className="w-16 text-center py-3 text-sm font-bold text-[#7B542F] outline-none"
+                                    type="text"
+                                    value={RugQnt}
+                                    aria-label="Quantity input"
+                                    id="quantity-input"
+                                    readOnly
+                                    />
+                                    <button
+                                    type="button"
+                                    onClick={() => setRugQnt((prev) => prev + 1)}
+                                    className="px-4 py-3 bg-[#7B542F] text-white hover:bg-[#5a3e24] transition-colors"
+                                    aria-label="Increment button"
+                                    >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+
                             {/* <!-- Material Info --> */}
                             <div className="p-6 bg-stone-50 rounded-lg">
                                 <div className="flex items-start mb-4">
@@ -155,7 +217,7 @@ export default function ProductDetail(){
 
                         {/* <!-- Actions --> */}
                         <div className="flex flex-col space-y-4">
-                            <button className="w-full bg-stone-900 text-white py-5 text-sm font-bold uppercase tracking-widest transition-soft hover:opacity-90">Add to Bag</button>
+                            <button onClick={HandleAddCart} className="w-full bg-stone-900 text-white py-5 text-sm font-bold uppercase tracking-widest transition-soft hover:opacity-90">Add to Bag</button>
                             <button onClick={Onsubmits} className="w-full border border-stone-200 py-5 text-sm font-bold uppercase tracking-widest transition-soft hover:bg-stone-50 flex items-center justify-center">
                                 {/* <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> */}
                                 
@@ -168,13 +230,6 @@ export default function ProductDetail(){
                                 Add to Wishlist
                             </button>
                         </div>
-                        {alertMessage && (
-                            <AlertMessage
-                            AlrType={alertType}
-                            AlrMessage={alertMessage}
-                            onClose={() => setAlertMessage('')}
-                            />
-                        )}
 
                         {/* <!-- Tabs/Details --> */}
                         <div className="mt-16 space-y-6">

@@ -6,7 +6,9 @@ export default function Navbar(){
 
     const [isLogin , setIsLogin] = useState(false)
     
-    const {token} = useApp()
+    const {user, token} = useApp()
+
+
 
     // console.log('token nav: ',token)
 
@@ -48,7 +50,7 @@ export default function Navbar(){
                             {/* <!-- Cart --> */}
                             <Link href="/cart" className="p-2 text-stone-600 hover:text-stone-900 transition-soft relative">
                                 <img src="/svgs/shopping-cart-sketch.svg" className="h-6 w-6" alt="shopping-cart-sketch.svg" />
-                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-stone-900 rounded-full transform translate-x-1/2 -translate-y-1/2">2</span>
+                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-stone-900 rounded-full transform translate-x-1/2 -translate-y-1/2">{user?.cart_shopping?.length}</span>
                             </Link>
                         </>)
                         :

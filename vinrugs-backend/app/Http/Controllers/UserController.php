@@ -80,13 +80,27 @@ class UserController extends Controller
      */
     public function ShowUser(Request $request)
     {
-        $user = $request->user()->load(['rugs', 'ccusers']);
+        try {
+            $user = $request->user()->load([
+                'rugs',
+                'ccusers',
+                'cart_shopping.rug.rug_imges'
+            ]);
 
-        return response()->json(
-            ['user' => $user,
-            'UserWishRugs' => $user->rugs,
-            'card_user' => $user->ccusers]
-            , 200);
+            return response()->json([
+                'user' => $user,
+                'UserWishRugs' => $user->rugs,
+                'card_user' => $user->ccusers,
+                'cart_shopping' => $user->cart_shopping,
+            ], 200);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
     }
 
     /**

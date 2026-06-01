@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useApp } from "../lib/AppContext";
 import { apiClient } from "../lib/api";
 import { useRouter } from "next/navigation";
+import toast from 'react-hot-toast';
 
 
 
@@ -18,8 +19,11 @@ export default function Asideprofile() {
         try {
             await checkLogout();
             router.push('/rugs')
+            toast.success('Logout successfully');
+
         } catch (error) {
             console.error(error);
+            toast.error(error,'Something went wrong');
         }
     }
 

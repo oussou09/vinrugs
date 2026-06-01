@@ -24,4 +24,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/addcarduser',[UserController::class, 'AddCardUser']);
     Route::post('/logoutuser', [UserController::class, 'LogoutUser']);
     Route::post('/arwishlist', [UserController::class, 'ARWishlist']);
+    Route::post('/addcartrug',[RugsController::class, 'UserTCart']);
 });

@@ -6,6 +6,8 @@ import { useApp } from '@/app/lib/AppContext'
 import Link from 'next/link'
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+
 
 export default function SecurityPage() {
 
@@ -36,13 +38,15 @@ export default function SecurityPage() {
         }
       )
       if (resp.status === 200 || resp.status === 201) {
-        alert('card added seccessfully')
+        // alert('card added seccessfully')
         reset()
         await fetchUserData()
+        toast.success('card payment added seccessfully');
       }
 
     } catch (error) {
         const errorMessage = error.response?.data?.message || error.message;
+        toast.error(error,'Something went wrong');
         console.error('Connection Error:', errorMessage);
         console.log("STATUS:", error.response?.status);
         console.log("DATA:", error.response?.data);
@@ -156,8 +160,8 @@ export default function SecurityPage() {
                                 <span>{cuser.full_name}</span>
                               </div>
                               <div className="flex gap-3 mt-5">
-                                <a href="#" className="text-[#FFCF71] hover:text-[#FF9D00] text-sm font-medium transition-colors underline underline-offset-2">Edit</a>
-                                <a href="#" className="text-[#FF0000] hover:text-red-400 text-sm font-medium transition-colors underline underline-offset-2">Remove</a>
+                                {/* <a href="#" className="text-[#FFCF71] hover:text-[#FF9D00] text-sm font-medium transition-colors underline underline-offset-2">Edit</a> */}
+                                <button className="text-[#FF0000] hover:text-red-400 text-sm font-medium transition-colors underline underline-offset-2">Remove</button>
                               </div>
                             </div>
                             ))}
@@ -169,7 +173,21 @@ export default function SecurityPage() {
                                 <label className="flex flex-col">
                                   <span className="mb-2 text-sm font-semibold uppercase tracking-widest">Card Number</span>
                                   <input
-                                    { ...register ("card_number",{ required: "card number is required"})}
+                                        {...register("card_number", {
+                                          required: "Card number is required",
+                                          maxLength: {
+                                            value: 16,
+                                            message: "Card number cannot exceed 16 digits",
+                                          },
+                                          minLength: {
+                                            value: 16,
+                                            message: "Card number must be exactly 16 digits",
+                                          },
+                                          pattern: {
+                                            value: /^[0-9]+$/,
+                                            message: "Only numbers are allowed",
+                                          },
+                                        })}
                                     className="rounded-md border-2 border-[#FFCF71]/30 bg-white/10 py-3 px-4 text-black placeholder-white/50 outline-none focus:border-[#FFCF71] focus:bg-white/20 transition-colors tracking-widest"
                                     type="text"
                                     name="card_number"
@@ -185,7 +203,17 @@ export default function SecurityPage() {
                                   <label className="flex flex-col">
                                     <span className="mb-2 text-sm font-semibold uppercase tracking-widest">Cardholder Name</span>
                                     <input
-                                      { ...register ("card_name",{ required: "Cardholder Name is required"})}
+                                        {...register("card_name", {
+                                          required: "Cardholder Name is required",
+                                          pattern: {
+                                            value: /^[A-Za-z\s]+$/,
+                                            message: "Only letters and spaces are allowed",
+                                          },
+                                          onChange: (e) => {
+                                            // Keeps only letters/spaces and forces uppercase (standard for payment cards)
+                                            e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, "").toUpperCase();
+                                          },
+                                        })}
                                       className="rounded-md border-2 border-[#FFCF71]/30 bg-white/10 py-3 px-4 text-black placeholder-white/50 outline-none focus:border-[#FFCF71] focus:bg-white/20 transition-colors"
                                       type="text"
                                       name="card_name"
@@ -197,7 +225,13 @@ export default function SecurityPage() {
                                   <label className="flex flex-col">
                                     <span className="mb-2 text-sm font-semibold uppercase tracking-widest">Expire Date</span>
                                     <input
-                                      { ...register ("expire_date",{ required: "expire date is required"})}
+                                          {...register("expire_date", {
+                                            required: "Expire date is required",
+                                            pattern: {
+                                              value: /^(0[1-12]|1[0-2])\/?([0-9]{2})$/,
+                                              message: "Use valid MM/YY format",
+                                            },
+                                          })}
                                       className="rounded-md border-2 border-[#FFCF71]/30 bg-white/10 py-3 px-4 text-black placeholder-white/50 outline-none focus:border-[#FFCF71] focus:bg-white/20 transition-colors"
                                       type="text"
                                       name="expire_date"

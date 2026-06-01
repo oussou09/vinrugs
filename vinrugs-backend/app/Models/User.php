@@ -35,9 +35,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function cart()
+    public function cart_shopping()
     {
-        return $this->hasOne(Carts::class);
+        return $this->hasMany(Carts::class, 'user_id');
     }
 
     public function ccusers()

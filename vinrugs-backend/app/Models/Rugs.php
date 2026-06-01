@@ -18,6 +18,11 @@ class Rugs extends Model
         return $this->hasMany(Rugs_imges::class, 'rug_id');
     }
 
+    public function cart_shopping()
+    {
+        return $this->hasMany(Carts::class, 'rug_id');
+    }
+
     public function wishlists() {
         return $this->hasMany(Wishlists::class);
     }

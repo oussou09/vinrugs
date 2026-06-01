@@ -1,9 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-import ConditionalNavbar from '@/app/ConditionalNavFoot/ConditionalNavbar'
-import ConditionalFooter from '@/app/ConditionalNavFoot/ConditionalFooter'
-import { AppProvider } from "./lib/AppContext";
+import ClientLayout from "./ConditionalNavFoot/ClientLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,11 +21,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <AppProvider>
-          <ConditionalNavbar />
+          <ClientLayout>
             {children}
-          <ConditionalFooter />
-        </AppProvider>
+          </ClientLayout>
       </body>
     </html>
   );

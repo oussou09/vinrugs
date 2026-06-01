@@ -1,6 +1,8 @@
 'use client';
 import Asideprofile from "@/app/(user_group)/asideprofile";
+import { apiClient } from "@/app/lib/api";
 import { useApp } from "@/app/lib/AppContext";
+import toast from 'react-hot-toast';
 
 
 export default function Wishlist(){
@@ -32,7 +34,7 @@ const wishlistItems = [
   },
 ]
 
-    const {user, products} = useApp()
+    const {user, products, token, refreshProducts, fetchUserData} = useApp()
 
     console.log(user)
 
@@ -44,6 +46,34 @@ const wishlistItems = [
     console.log("products: ", products)
     console.log("rugs users: ", user?.rugs)
     console.log("list_products ", list_products)
+
+    const handleDelete = async (RugId) => {
+      const dataForm = new FormData();
+
+      dataForm.append('rug_id', RugId)
+      dataForm.append('type_tret', 1)
+
+      try {
+        const resp = await apiClient.post('/arwishlist', dataForm, {
+          headers: {
+            Authorization: token
+          }
+        });
+
+        await fetchUserData()
+        await refreshProducts()
+
+        toast.success('Wishlist rug was removed');
+
+      } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message;
+            toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+            console.error('Connection Error:', errorMessage);
+            console.log("STATUS:", error.response?.status);
+            console.log("DATA:", error.response?.data);
+            console.log("FULL ERROR:", error);
+      }
+    }
 
     return(
     <section className="py-12 md:py-24">
@@ -62,7 +92,7 @@ const wishlistItems = [
                 <div key={item.id} className="group relative">
                   <div className="aspect-[3/4] overflow-hidden bg-[#f0e4d3] relative">
                     <img src={`http://127.0.0.1:8000/storage/${item.rug_imges?.[0]?.main_rug_path}`} className="w-full h-full object-cover" alt={item.rug_title} />
-                    <button className="absolute top-4 right-4 p-2 bg-white/80 rounded-full hover:bg-red-50 text-stone-400 hover:text-red-500 transition-colors">
+                    <button onClick={() => handleDelete(item.id)} className="absolute top-4 right-4 p-2 bg-white/80 rounded-full hover:bg-red-50 text-stone-400 hover:text-red-500 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                     </button>
                     <div className="absolute bottom-0 w-full h-1 bg-[#FF9D00] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Carts;
 use App\Models\Rugs;
 use App\Models\Rugs_imges;
 use Illuminate\Http\Request;
@@ -114,11 +115,53 @@ public function StoreRug(Request $request)
     }
 
     /**
-     * Display the specified resource.
+     * Add rug to user cart
      */
-    public function show(string $id)
+    public function UserTCart(Request $request)
     {
         //
+        $user = $request->user();
+        $validateData = $request->validate([
+            'rug_id' => 'required|exists:rugs,id',
+            'rug_Quantity' => 'required|integer|min:1',
+        ]);
+
+        $rug = Rugs::findOrFail($validateData['rug_id']);
+
+        if ($rug->rug_quantity < $validateData['rug_Quantity']) {
+            return response()->json([
+                'message' => 'Not enough stock available'
+            ], 422);
+        }
+
+        $cartItem = Carts::where('user_id', $user->id)
+            ->where('rug_id', $request->rug_id)
+            ->first();
+
+        if ($cartItem) {
+            $newQuantity = $cartItem->quantity + $validateData['rug_Quantity'];
+
+            if ($rug->rug_quantity < $newQuantity) {
+                return response()->json([
+                    'message' => 'Requested quantity exceeds stock'
+                ], 422);
+            }
+
+            $cartItem->update([
+                'quantity' => $newQuantity
+            ]);
+        } else {
+            $cartItem = Carts::create([
+                'user_id' => $user->id,
+                'rug_id' => $request->rug_id,
+                'cart_rug_quantity' => $validateData['rug_Quantity'],
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Added to cart successfully',
+        ], 200);
+
     }
 
     /**

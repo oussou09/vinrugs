@@ -1,7 +1,7 @@
 "use client";
 import {apiClient} from "@/app/lib/api";
 import { useForm } from 'react-hook-form';
-
+import toast from 'react-hot-toast';
 
 export default function Contact(){
 
@@ -21,9 +21,11 @@ export default function Contact(){
             const resp = await apiClient.post('/contactus', dataForm);
             if (resp.status === 201 || resp.status ===200) {
                 reset()
+                toast.success(`Mr.${data.name} Your message send successfully, we will contact you`);
             }
-
+            
         } catch (err) {
+                toast.error(err.response?.data?.message || err.message || 'Something went wrong');
                 console.error('Full error:', err.response?.data);
                 console.error('Status:', err.response?.status);
                 console.error('Message:', err.message);

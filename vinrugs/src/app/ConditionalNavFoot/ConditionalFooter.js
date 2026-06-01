@@ -1,4 +1,4 @@
-// src/components/ConditionalNavbar.js
+
 "use client"; // هذا الملف هو الوحيد الذي سيكون Client
 
 import { usePathname } from 'next/navigation';
