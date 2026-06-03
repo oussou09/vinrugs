@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\MailNewsLetterController;
 use App\Http\Controllers\RugsController;
 use App\Http\Controllers\UserController;
 
@@ -12,6 +13,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 Route::post('/contactus',[ContactUsController::class, 'StoreContact']);
 Route::get('/contacts', [ContactUsController::class, 'GetContacts']);
+Route::post('/mailnewsletter',[MailNewsLetterController::class, 'StoreMNL']);
 
 Route::post('/loginuser', [UserController::class, 'LoginUser']);
 Route::post('/storeuser', [UserController::class, 'StoreUser']);
@@ -25,4 +27,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logoutuser', [UserController::class, 'LogoutUser']);
     Route::post('/arwishlist', [UserController::class, 'ARWishlist']);
     Route::post('/addcartrug',[RugsController::class, 'UserTCart']);
+    Route::post('/removecartrug',[RugsController::class, 'RemoveRugsCart']);
 });

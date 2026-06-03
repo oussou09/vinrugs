@@ -21,6 +21,12 @@ class RugSeeder extends Seeder
 
         // 2. البيانات الدقيقة لجدول الصور التي أرسلتها
         $specificImages = [
+            1 => ['main' => 'rugs/main_imges/rug-title-24723565740.jpg',  'sec' => 'rugs/second_images/rug-title-2472315001950.jpg.jpg', 'time' => '2026-05-14 00:50:23'],
+            3 => ['main' => 'rugs/main_imges/rug-title-24583.jpg',  'sec' => 'rugs/second_images/rug-title-2458315001950.jpg', 'time' => '2026-05-14 00:50:23'],
+            5 => ['main' => 'rugs/main_imges/rug-title-15239565740.jpg',  'sec' => 'rugs/second_images/rug-title-1523915001950.jpg', 'time' => '2026-05-14 00:50:23'],
+            6 => ['main' => 'rugs/main_imges/rug-title-1044915001950.jpg',  'sec' => 'rugs/second_images/rug-title-10449200260.jpg', 'time' => '2026-05-14 00:50:23'],
+            7 => ['main' => 'rugs/main_imges/rug-title-1201280365.jpg',  'sec' => 'rugs/second_images/rug-title-1201280365.jpg', 'time' => '2026-05-14 00:50:23'],
+            8 => ['main' => 'rugs/main_imges/rug-title-21355565740.jpg',  'sec' => 'rugs/second_images/rug-title-2135515001950.jpg', 'time' => '2026-05-14 00:50:23'],
             9  => ['main' => 'rugs/main_imges/rug-title-1778635622.jpeg', 'sec' => null, 'time' => '2026-05-13 01:27:02'],
             10 => ['main' => 'rugs/main_imges/rug-title-1778719133.jpeg', 'sec' => null, 'time' => '2026-05-14 00:38:53'],
             11 => ['main' => 'rugs/main_imges/rug-title-1778719145.jpeg', 'sec' => null, 'time' => '2026-05-14 00:39:05'],
@@ -32,13 +38,13 @@ class RugSeeder extends Seeder
         ];
 
         // 3. إنشاء 16 منتج سجاد
-        for ($i = 1; $i <= 16; $i++) {
+        for ($i = 1; $i <= 23; $i++) {
             $title = "Handmade Moroccan Rug " . $i;
             $rug = Rugs::create([
                 'id'              => $i,
                 'rug_title'       => $title,
                 'rug_slug'        => Str::slug($title) . '-' . $i,
-                'rug_description' => "Premium quality wool rug, handcrafted with traditional Berber patterns. Perfect for modern and classic interiors.",
+                'rug_description' => $i.'Premium quality wool rug, handcrafted with traditional Berber patterns. Perfect for modern and classic interiors.',
                 'rug_category'    => rand(1, 4),
                 'rug_quantity'    => rand(5, 50),
                 'rug_price'       => rand(400, 2500),

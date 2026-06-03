@@ -34,7 +34,7 @@ const wishlistItems = [
   },
 ]
 
-    const {user, products, token, refreshProducts, fetchUserData} = useApp()
+    const {user, products, token, refreshProducts, fetchUserData, loadingAuth} = useApp()
 
     console.log(user)
 
@@ -88,26 +88,65 @@ const wishlistItems = [
             <p className="text-stone-400 tracking-wide uppercase text-xs font-bold">{wishlistItems.length} Pieces Saved</p>
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-              {list_products.map((item) => (
-                <div key={item.id} className="group relative">
-                  <div className="aspect-[3/4] overflow-hidden bg-[#f0e4d3] relative">
-                    <img src={`http://127.0.0.1:8000/storage/${item.rug_imges?.[0]?.main_rug_path}`} className="w-full h-full object-cover" alt={item.rug_title} />
-                    <button onClick={() => handleDelete(item.id)} className="absolute top-4 right-4 p-2 bg-white/80 rounded-full hover:bg-red-50 text-stone-400 hover:text-red-500 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                    </button>
-                    <div className="absolute bottom-0 w-full h-1 bg-[#FF9D00] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                  </div>
-                  <div className="mt-6 flex justify-between items-end">
-                    <div>
-                      <h3 className="text-sm font-medium text-[#7B542F]">{item.rug_title}</h3>
-                      <p className="text-xs text-stone-400 mt-1">{item.rug_price}</p>
+              { loadingAuth ?
+                (
+                  <div className="group relative animate-pulse">
+                    <div className="aspect-[3/4] overflow-hidden bg-[#f0e4d3] relative">
+                      <div className="w-full h-full bg-[#e7d7c1]" />
+                      <div className="absolute top-4 right-4 p-2 bg-white/60 rounded-full">
+                        <div className="w-4 h-4 bg-[#d4c4a8] rounded" />
+                      </div>
                     </div>
-                    <button className="text-[10px] font-bold uppercase tracking-widest text-[#FF9D00] border-b border-[#FF9D00] pb-1 hover:text-[#b8871a] hover:border-[#b8871a] transition-colors">
-                      Move to cart
-                    </button>
+                    <div className="mt-6 flex justify-between items-end">
+                      <div className="space-y-2">
+                        <div className="h-4 w-32 bg-[#f0e4d3] rounded" />
+                        <div className="h-3 w-16 bg-[#f0e4d3] rounded" />
+                      </div>
+                      <div className="h-3 w-20 bg-[#f0e4d3] rounded" />
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+                : !user?.rugs?.length ?
+                (
+                  <div className="border border-[#eddcc9] p-12 flex flex-col items-center justify-center gap-4 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-[#d4c4a8]">
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                    </svg>
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-[#7B542F] mb-1">No Saved Items</h3>
+                      <p className="text-xs text-stone-400 max-w-xs mx-auto">Your wishlist is empty. Start curating your vintage rug collection.</p>
+                    </div>
+                    <a href="/rugs" className="mt-2 px-6 py-2.5 bg-[#FF9D00] text-white text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-[#b8871a] transition-colors">
+                      Browse Collection
+                    </a>
+                  </div>
+                )
+                :
+                (
+                  <>
+                    {list_products.map((item) => (
+                      <div key={item.id} className="group relative">
+                        <div className="aspect-[3/4] overflow-hidden bg-[#f0e4d3] relative">
+                          <img src={`http://127.0.0.1:8000/storage/${item.rug_imges?.[0]?.main_rug_path}`} className="w-full h-full object-cover" alt={item.rug_title} />
+                          <button onClick={() => handleDelete(item.id)} className="absolute top-4 right-4 p-2 bg-white/80 rounded-full hover:bg-red-50 text-stone-400 hover:text-red-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                          </button>
+                          <div className="absolute bottom-0 w-full h-1 bg-[#FF9D00] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                        </div>
+                        <div className="mt-6 flex justify-between items-end">
+                          <div>
+                            <h3 className="text-sm font-medium text-[#7B542F]">{item.rug_title}</h3>
+                            <p className="text-xs text-stone-400 mt-1">{item.rug_price}</p>
+                          </div>
+                          <button className="text-[10px] font-bold uppercase tracking-widest text-[#FF9D00] border-b border-[#FF9D00] pb-1 hover:text-[#b8871a] hover:border-[#b8871a] transition-colors">
+                            Move to cart
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )
+              }
             </div>
           </div>
         </div>

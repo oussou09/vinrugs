@@ -127,11 +127,16 @@ public function StoreRug(Request $request)
         ]);
 
         $rug = Rugs::findOrFail($validateData['rug_id']);
+        $isUnlimited = $rug->rug_quantity == 0;
 
-        if ($rug->rug_quantity < $validateData['rug_Quantity']) {
+        if (!$isUnlimited && $rug->rug_quantity < $validateData['rug_Quantity']) {
             return response()->json([
                 'message' => 'Not enough stock available'
             ], 422);
+        }
+
+        if ($rug->rug_quantity === 0 ) {
+
         }
 
         $cartItem = Carts::where('user_id', $user->id)
@@ -141,7 +146,7 @@ public function StoreRug(Request $request)
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + $validateData['rug_Quantity'];
 
-            if ($rug->rug_quantity < $newQuantity) {
+            if (!$isUnlimited && $rug->rug_quantity < $newQuantity) {
                 return response()->json([
                     'message' => 'Requested quantity exceeds stock'
                 ], 422);
@@ -181,10 +186,28 @@ public function StoreRug(Request $request)
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove rug from cart user.
      */
-    public function destroy(string $id)
+    public function RemoveRugsCart(Request $request)
     {
-        //
+        $user = $request->user();
+
+        $validateData = $request->validate([
+            'rug_id' => 'required|exists:rugs,id',
+        ]);
+
+        $deleted = Carts::where('user_id', $user->id)->where('rug_id', $validateData['rug_id'])->delete();
+
+        if (!$deleted) {
+
+            return response()->json([
+                'message' => 'The Rug is not in your Cart'
+            ], 404);
+
+        }
+            return response()->json([
+                'message' => 'The Rug is Deleted from your Cart'
+            ], 200);
+
     }
 }

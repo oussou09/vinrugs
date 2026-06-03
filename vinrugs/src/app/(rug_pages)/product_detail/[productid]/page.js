@@ -81,6 +81,7 @@ export default function ProductDetail(){
 
             if (resp.status === 200 || resp.status === 201) {
                 // alert('rug added seccessfully')
+                setRugQnt(1)
                 await fetchUserData()
                 await refreshProducts()
                 toast.success(resp.data.message || 'Rug Added to your cart seccessfully');
@@ -107,6 +108,8 @@ export default function ProductDetail(){
     }
 
     const myproduct = products.find((product) => product.id == productid);
+    const stock = myproduct?.rug_quantity ?? 0;
+    const isUnlimited = stock === 0;
 
     console.log('myproduct: ',myproduct);
 
@@ -115,8 +118,8 @@ export default function ProductDetail(){
     }
     // console.log(errormessage)
     
-    const mainimg = myproduct?.rug_imges?.[0]?.main_rug_path ? `http://127.0.0.1:8000/storage/${myproduct.rug_imges[0].main_rug_path.replace(/^\/+/, "")}` : errormessage;
     const errormessage = "http://127.0.0.1:8000/storage/imgcomming.jpg";
+    const mainimg = myproduct?.rug_imges?.[0]?.main_rug_path ? `http://127.0.0.1:8000/storage/${myproduct.rug_imges[0].main_rug_path.replace(/^\/+/, "")}` : errormessage;
 
     console.log("IsLikes ",IsLikes)
 
@@ -153,7 +156,7 @@ export default function ProductDetail(){
                             <a href="#">Persian Silk</a>
                         </nav>
 
-                        <h1 className="serif text-4xl mb-2">{myproduct.rug_title} <br /> ({myproduct.rug_quantity} left)</h1>
+                        <h1 className="serif text-4xl mb-2">{myproduct.rug_title} <br /> {myproduct.rug_quantity > 0 ? `(${myproduct.rug_quantity} left)` : null}</h1>
                         <p className="text-2xl font-light text-stone-900 mb-8">${myproduct.rug_price}</p>
 
                         {/* <!-- Configuration --> */}
@@ -177,8 +180,8 @@ export default function ProductDetail(){
                                 <div className="flex items-center">
                                     <button
                                     type="button"
-                                    disabled={ RugQnt <= 1 }
-                                    onClick={() => setRugQnt((prev) => prev + 1)}
+                                    disabled={!isUnlimited && RugQnt >= stock}
+                                    onClick={() => setRugQnt((prev) => prev - 1)}
                                     className="px-4 py-3 bg-[#7B542F] text-white hover:bg-[#5a3e24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     aria-label="Decrement button"
                                     >

@@ -103,7 +103,7 @@ export default function Rugs(){
                                 />
                                 <div className="absolute top-4 left-4">
                                 <span className="bg-stone-900 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1">
-                                    Limited Edition
+                                    {product.rug_quantity > 0 ? 'Limited Edition' : 'Unlimited Edition'}
                                 </span>
                                 </div>
                                 <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">

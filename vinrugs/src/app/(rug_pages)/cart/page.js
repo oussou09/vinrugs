@@ -1,11 +1,14 @@
 "use client";
+import { apiClient } from "@/app/lib/api";
 import { useApp } from "@/app/lib/AppContext"
 import { useEffect, useState } from "react";
+import toast from 'react-hot-toast';
+
 
 
 export default function Card(){
 
-    const {token, user, loadingAuth} = useApp()
+    const {token, user, loadingAuth, refreshProducts, fetchUserData} = useApp()
     const [totalPriceRugs, setTotalPriceRugs] = useState(0)
     const [shippinRug, setShippinRug] = useState(0)
     const [totalPrice, setotalPrice] = useState(0)
@@ -41,6 +44,34 @@ export default function Card(){
         console.log('totalPrice ',totalPrice)
         console.log('shippinRug ', shippinRug)
         console.log('totalPrice ', totalPrice)
+
+
+
+        const HandleDelete = async (RugId) => {
+
+            console.log("sending rug_id:", RugId);
+            const dataForm = new FormData();
+            
+            try {
+                dataForm.append('rug_id', RugId);
+                const resp = await apiClient.post('/removecartrug', dataForm, {
+                    headers:{Authorization:token}
+                });
+                if (resp.status === 200 || resp.status === 201) {
+                    await fetchUserData()
+                    await refreshProducts()
+                    toast.success(resp.data.message || 'Rug Removed from your cart seccessfully');
+                }
+
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || error.message;
+                toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+                console.error('Connection Error:', errorMessage);
+                console.log("STATUS:", error.response?.status);
+                console.log("DATA:", error.response?.data);
+                console.log("FULL ERROR:", error);
+            }
+        }
 
     return(
         // <!-- Shopping Cart Page -->
@@ -101,7 +132,7 @@ export default function Card(){
                             (
                                 <>
                                 {user?.cart_shopping?.map((product) => (
-                                    <div key={product.id} className="py-10 border-b border-stone-100 flex gap-8">
+                                    <div key={product?.id} className="py-10 border-b border-stone-100 flex gap-8">
                                         <div className="w-24 h-32 md:w-40 md:h-52 bg-stone-100 flex-shrink-0">
                                             <img src={`http://127.0.0.1:8000/storage/${product?.rug?.rug_imges?.[0]?.main_rug_path}`} alt="Rug Thumbnail" className="w-full h-full object-cover" />
                                         </div>
@@ -124,7 +155,7 @@ export default function Card(){
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                                                     </button>
                                                 </div>
-                                                <button className="text-xs uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-soft underline">Remove</button>
+                                                <button type="submit" onClick={ () => HandleDelete(product?.rug?.id)} className="text-xs uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-soft underline">Remove</button>
                                             </div>
                                         </div>
                                     </div>
@@ -211,9 +242,9 @@ export default function Card(){
                                 <span>${totalPrice}</span>
                             </div>
                             
-                            <a href="/checkout" className="block w-full bg-stone-900 text-white text-center py-5 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-soft">
+                            <button  className="block w-full bg-stone-900 text-white text-center py-5 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-soft">
                                 Proceed to Checkout
-                            </a>
+                            </button>
                             
                             <div className="mt-8">
                                 <p className="text-[10px] uppercase tracking-widest text-stone-400 text-center leading-relaxed">
