@@ -12,37 +12,37 @@ export default function ClientLayout({ children }) {
 
   return (
     <AppProvider>
-      {!hideLayout && <ConditionalNavbar />}
+        {!hideLayout && <ConditionalNavbar />}
 
-      {children}
+        {children}
 
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#fff7ed',
-            color: '#7B542F',
-            border: '1px solid #eddcc9',
-          },
-          success: {
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            duration: 3000,
             style: {
-              background: '#ecfdf5',
-              color: '#166534',
-              border: '1px solid #86efac',
+              background: '#fff7ed',
+              color: '#7B542F',
+              border: '1px solid #eddcc9',
             },
-          },
-          error: {
-            style: {
-              background: '#fef2f2',
-              color: '#991b1b',
-              border: '1px solid #fca5a5',
+            success: {
+              style: {
+                background: '#ecfdf5',
+                color: '#166534',
+                border: '1px solid #86efac',
+              },
             },
-          },
-        }}
-      />
+            error: {
+              style: {
+                background: '#fef2f2',
+                color: '#991b1b',
+                border: '1px solid #fca5a5',
+              },
+            },
+          }}
+        />
 
-      {!hideLayout && <ConditionalFooter />}
+        {!hideLayout && <ConditionalFooter />}
     </AppProvider>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 import { apiClient } from "@/app/lib/api";
 import { useApp } from "@/app/lib/AppContext"
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import toast from 'react-hot-toast';
 
 
@@ -9,9 +11,11 @@ import toast from 'react-hot-toast';
 export default function Card(){
 
     const {token, user, loadingAuth, refreshProducts, fetchUserData} = useApp()
+    const {register, handleSubmit, formState : {errors, isSubmitting}, reset} = useForm()
     const [totalPriceRugs, setTotalPriceRugs] = useState(0)
     const [shippinRug, setShippinRug] = useState(0)
     const [totalPrice, setotalPrice] = useState(0)
+    const router = useRouter();
 
     console.log(user?.cart_shopping?.[0]?.rug?.rug_imges?.[0]?.main_rug_path);
 
@@ -25,8 +29,9 @@ export default function Card(){
 
         // 2. Calculate total price using a local variable (synchronous)
         const calculatedTotal = user.cart_shopping.reduce((sum, item) => {
-            const price = Number(item.rug?.rug_price) || 0;
-            return sum + price;
+            const price = Number(item.rug?.rug_price || 0);
+            const qty = Number(item.cart_rug_quantity || 0);
+            return sum + price * qty;
         }, 0);
 
         // 3. Calculate shipping using the fresh local variable
@@ -217,32 +222,12 @@ export default function Card(){
                                 </div>
                             </div>
 
-                                <div className="mb-8 border-b border-stone-200 pb-8">
-                                <div className="flex items-end gap-3">
-                                    <div className="flex-grow">
-                                    <label htmlFor="discount-code" className="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">
-                                        Discount Code
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="discount-code"
-                                        placeholder="Enter code"
-                                        className="w-full px-4 py-3 border-2 border-stone-200 rounded-lg text-sm font-medium text-stone-900 placeholder-stone-400 outline-none focus:border-stone-900 transition-colors"
-                                    />
-                                    </div>
-                                    <button style={{ marginBottom: '5px' }} className="px-6 py-3 bg-stone-900 text-white text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-stone-700 transition-soft flex-shrink-0">
-                                    Apply
-                                    </button>
-                                </div>
-                                </div>
-
-
                             <div className="flex justify-between text-lg font-bold mb-8">
                                 <span>Total</span>
                                 <span>${totalPrice}</span>
                             </div>
                             
-                            <button  className="block w-full bg-stone-900 text-white text-center py-5 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-soft">
+                            <button onClick={() => {router.push('/checkout')}}  className="block w-full bg-stone-900 text-white text-center py-5 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-soft">
                                 Proceed to Checkout
                             </button>
                             

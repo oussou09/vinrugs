@@ -10,3 +10,15 @@ textarea:focus {
 button {
   cursor: pointer;
 }
+
+@layer utilities {
+  .serif {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+
+  .transition-soft {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+  }
+}

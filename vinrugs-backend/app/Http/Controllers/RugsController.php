@@ -7,6 +7,7 @@ use App\Models\Rugs;
 use App\Models\Rugs_imges;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class RugsController extends Controller
 {
@@ -170,11 +171,43 @@ public function StoreRug(Request $request)
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Checkout Payment.
      */
-    public function edit(string $id)
+    public function CheckoutPayment(Request $request)
     {
-        //
+        Log::info('Incoming Request Data:', $request->all());
+
+        $user = $request->user();
+
+        if ((!$request->cardnumber || !$request->expiry || !$request->cvc) && (!$request->idCard || !$request->cvc)) {
+            return response()->json(['message' => 'Card information is required.'], 422);
+        }
+
+        try {
+            $validatorData = $request->validate([
+                'Fname' => 'required|string' ,
+                'Lname' => 'required|string' ,
+                'address' => 'required|string' ,
+                'city' => 'required|string' ,
+                'postal_code' => 'required|string' ,
+                'email' => 'required|email',
+                'DiscountCode' => 'nullable|string' ,
+            ])
+
+            // amount calc
+
+
+
+
+
+
+
+
+
+
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 
     /**

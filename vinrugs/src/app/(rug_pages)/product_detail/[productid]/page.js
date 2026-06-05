@@ -153,7 +153,13 @@ export default function ProductDetail(){
                         <nav className="flex text-xs uppercase tracking-widest text-stone-400 mb-6 space-x-2">
                             <a href="/rugs">Shop</a>
                             <span>/</span>
-                            <a href="#">Persian Silk</a>
+                            <a href="#">
+                                { myproduct.rug_category === 1 ? 'Persian' 
+                                : myproduct.rug_category === 2 ? 'Turkish'
+                                : myproduct.rug_category === 3 ? 'Moroccan'
+                                : myproduct.rug_category === 4 ? 'Modern'
+                                : 'Unknown Category'}
+                            </a>
                         </nav>
 
                         <h1 className="serif text-4xl mb-2">{myproduct.rug_title} <br /> {myproduct.rug_quantity > 0 ? `(${myproduct.rug_quantity} left)` : null}</h1>
@@ -180,8 +186,8 @@ export default function ProductDetail(){
                                 <div className="flex items-center">
                                     <button
                                     type="button"
-                                    disabled={!isUnlimited && RugQnt >= stock}
-                                    onClick={() => setRugQnt((prev) => prev - 1)}
+                                    disabled={RugQnt <= 1}
+                                    onClick={() => setRugQnt((prev) => Math.min(RugQnt ,prev - 1))}
                                     className="px-4 py-3 bg-[#7B542F] text-white hover:bg-[#5a3e24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     aria-label="Decrement button"
                                     >
@@ -197,8 +203,9 @@ export default function ProductDetail(){
                                     />
                                     <button
                                     type="button"
-                                    onClick={() => setRugQnt((prev) => prev + 1)}
-                                    className="px-4 py-3 bg-[#7B542F] text-white hover:bg-[#5a3e24] transition-colors"
+                                    disabled={!isUnlimited && RugQnt >= stock}
+                                    onClick={() => setRugQnt((prev) => Math.max(RugQnt ,prev + 1))}
+                                    className="px-4 py-3 bg-[#7B542F] text-white hover:bg-[#5a3e24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     aria-label="Increment button"
                                     >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>

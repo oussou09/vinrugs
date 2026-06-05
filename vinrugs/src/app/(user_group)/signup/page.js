@@ -111,7 +111,7 @@ export default function Signup(){
                         
                         <div className="flex items-start space-x-3 mb-8">
                             <input type="checkbox" checked={accAgr} onChange={ () => setAccAgr(!accAgr)} className="mt-1 w-4 h-4 rounded border-stone-300 text-stone-900 focus:ring-stone-500" />
-                            <p className="text-[10px] text-stone-500 leading-relaxed uppercase tracking-widest">I agree to the <a href="#" className="underline">Terms of Service</a> and allow Rug Artisan to preserve my preferences.</p>
+                            <p className="text-[10px] text-stone-500 leading-relaxed uppercase tracking-widest">I agree to the <a href="/privacypolicy" className="underline">Terms of Service</a> and allow Rug Artisan to preserve my preferences.</p>
                         
                         </div>
 

@@ -44,25 +44,41 @@ export default function Rugs(){
                 
                 {/* --- Header --- */}
                 <header className="mb-8 border-b border-stone-100 pb-8 flex flex-col md:flex-row md:items-end justify-between">
-                <div>
-                    <h1 className="serif text-5xl mb-4">All Rugs</h1>
-                    <p className="text-stone-500">
-                    {loading ? "Updating inventory..." : `Browse our master collection of over ${products.length} handcrafted weaving pieces.`}
-                    </p>
-                </div>
-                
-                <div className="mt-8 md:mt-0 flex items-center space-x-6">
-                    <span className="text-xs font-medium uppercase tracking-widest text-stone-400">Sort by:</span>
-                    <select
-                    className="bg-transparent border-none text-sm font-bold py-0 pl-0 pr-8 focus:ring-0 cursor-pointer text-stone-900 focus:outline-none"
-                    defaultValue="New Arrivals"
-                    >
-                    <option value="New Arrivals">New Arrivals</option>
-                    <option value="Price: Low to High">Price: Low to High</option>
-                    <option value="Price: High to Low">Price: High to Low</option>
-                    <option value="Size: Largest First">Size: Largest First</option>
-                    </select>
-                </div>
+                    <div>
+                        <h1 className="serif text-3xl mb-4">All Rugs</h1>
+                        <p className="text-stone-500">
+                        {loading ? "Updating inventory..." : `Browse our master collection of over ${products.length} handcrafted weaving pieces.`}
+                        </p>
+                    </div>
+                    
+                    <div className="mt-8 md:mt-0 flex items-center space-x-6">
+                        <div>
+                            <span className="text-[10px] font-medium uppercase tracking-widest text-stone-400">Sort by Price:</span>
+                            <select
+                            className="bg-transparent border-none text-xs font-bold py-0 pl-0 focus:ring-0 cursor-pointer text-stone-900 focus:outline-none"
+                            defaultValue="New Arrivals"
+                            >
+                                <option value="New Arrivals">New Arrivals</option>
+                                <option value="Price: Low to High">Price: Low to High</option>
+                                <option value="Price: High to Low">Price: High to Low</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <span className="text-[10px] font-medium uppercase tracking-widest text-stone-400">Sort by Category:</span>
+                            <select
+                            className="bg-transparent border-none text-xs font-bold py-0 pl-0 focus:ring-0 cursor-pointer text-stone-900 focus:outline-none"
+                            defaultValue="New Arrivals"
+                            >
+                                <option value="New Arrivals">New Arrivals</option>
+                                <option value={1}>Category: Persian</option>
+                                <option value={2}>Category: Turkish</option>
+                                <option value={3}>Category: Moroccan</option>
+                                <option value={4}>Category: Modern</option>
+                            </select>
+                        </div>
+                    </div>
+
                 </header>
 
                 <div className="flex flex-col md:flex-row gap-12">

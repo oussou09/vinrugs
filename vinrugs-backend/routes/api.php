@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\MailNewsLetterController;
 use App\Http\Controllers\RugsController;
 use App\Http\Controllers\UserController;
@@ -28,4 +29,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/arwishlist', [UserController::class, 'ARWishlist']);
     Route::post('/addcartrug',[RugsController::class, 'UserTCart']);
     Route::post('/removecartrug',[RugsController::class, 'RemoveRugsCart']);
+    Route::post('/checkdiscount', [DiscountController::class, 'CheckDiscount']);
+    Route::post('/checkoutpayment', [RugsController::class, 'CheckoutPayment']);
 });
