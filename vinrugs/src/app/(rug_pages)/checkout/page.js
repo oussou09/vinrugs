@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from 'react-hot-toast';
 import styled from "styled-components";
+import Payment from "../payment/page";
 
 
 
@@ -13,6 +14,7 @@ import styled from "styled-components";
 export default function Checkout(){
 
     const {token, user, loadingAuth, refreshProducts, fetchUserData} = useApp()
+    // console.log('token checkout: ',token)
 const {
     register,
     handleSubmit,
@@ -21,17 +23,14 @@ const {
     setError,
     clearErrors,
     } = useForm({
-    defaultValues: {
-        Fname: "",
-        Lname: "",
-        address: "",
-        city: "",
-        postalcode: "",
-        DiscountCode: "",
-        cardnumber: "",
-        expiry: "",
-        cvc: "",
-    },
+        defaultValues: {
+            Fname: "",
+            Lname: "",
+            address: "",
+            city: "",
+            postalcode: "",
+            DiscountCode: "",
+        },
     });
     const [totalPriceRugs, setTotalPriceRugs] = useState(0)
     const [shippinRug, setShippinRug] = useState(0)
@@ -50,13 +49,11 @@ const {
             reset({
             Fname: user.first_name || "",
             Lname: user.last_name || "",
+            email: user.email || "",
             address: "",
             city: "",
             postalcode: "",
             DiscountCode: "",
-            cardnumber: "",
-            expiry: "",
-            cvc: "",
             });
         }
 
@@ -81,7 +78,7 @@ const {
 
         const beforeDiscount = calculatedTotal + calculatedShipping;
         const discountAmount =
-            discountPorcent > 0 ? (beforeDiscount * discountPorcent) / 100 : 0;
+                discountPorcent > 0 ? (beforeDiscount * discountPorcent) / 100 : 0;
 
         const finalTotal = beforeDiscount - discountAmount;
 
@@ -121,54 +118,18 @@ const {
 
         const dataForm = new FormData();
 
-        try {
-
-            const hasSavedCard = !!selectedCard;
-            const hasNewCard = !!data.cardnumber && !!data.expiry && !!data.cvc;
-
-            if (!hasSavedCard && !hasNewCard) {
-                setError("selectedCard", {
-                    type: "manual",
-                    message: "Please select a saved card or enter a new card",
-                });
-                return;
-            }
-
-            clearErrors("selectedCard");
-
-            if (hasSavedCard) {
-                dataForm.append("idCard", String(selectedCard));
-                dataForm.append("cvc", data.cvc || "");
-            } else {
-                dataForm.append("cardnumber", data.cardnumber);
-                dataForm.append("expiry", data.expiry);
-                dataForm.append("cvc", data.cvc);
-            }
-
             dataForm.append('Fname', data.Fname);
             dataForm.append('Lname', data.Lname);
+            dataForm.append('email', data.email);
             dataForm.append('address', data.address);
             dataForm.append('city', data.city);
             dataForm.append('postal_code', data.postalcode);
             dataForm.append("DiscountCode", discountName)
-            const resp = await apiClient.post('/checkoutpayment', dataForm,{
-                headers:{Authorization:token},
-            })
 
-            if(resp.status === 200 || resp.status === 201 ){
-                reset()
-                setSelectedCard(0)
-                toast.success(resp.data.message || 'Payment was seccessfully');
-            }
-            
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message;
-            toast.error(errorMessage || 'Something went wrong');
-            console.error('Connection Error:', errorMessage);
-            console.log("STATUS:", error.response?.status);
-            console.log("DATA:", error.response?.data);
-            console.log("FULL ERROR:", error);
-        }
+            return(
+            <Payment userdata={dataForm}/>
+            )
+
     }
 
     return(
@@ -203,6 +164,14 @@ const {
 
                                     </div>
                                     <div className="col-span-2">
+                                        <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">Email</label>
+                                        <input
+                                            { ...register ("email",{ required: "Email is required"})}
+                                            name="email"
+                                            type="email" className="w-full bg-white border border-stone-200 p-3 text-sm focus:ring-1 focus:ring-stone-900 focus:border-stone-900 outline-none" />
+                                            {errors.email && <span className="text-red-500">{errors.email.message}</span>}
+                                    </div>
+                                    <div className="col-span-2">
                                         <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">Address</label>
                                         <input
                                             { ...register ("address",{ required: "Address is required"})}
@@ -231,7 +200,7 @@ const {
                             </div>
 
                             {/* <!-- Section: Payment --> */}
-                            <div>
+                            {/* <div>
                                 <h3 className="text-xs font-bold uppercase tracking-widest border-b border-stone-200 pb-4">2. Payment Method</h3>
                                 <StyledWrapper>
                                     {user?.ccusers?.map((cuser, index) => (
@@ -260,12 +229,11 @@ const {
                                             </div>
                                             {selectedCard == cuser.id && (
                                                 <div className={`mt-1 ${index === user?.ccusers?.length - 1 ? 'mb-7' : ''}`}>
-                                                    {/* <div className='mt-1 last:mb-7'> */}
                                                     <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">
                                                         CVC
                                                     </label>
                                                     <input
-                                                        {...register("cvc", {
+                                                        {...register("cvcSelected", {
                                                             required: "CVC is required",
                                                             maxLength: {
                                                                 value: 4,
@@ -281,7 +249,7 @@ const {
                                                             },
                                                         })}
                                                         type="number"
-                                                        name="cvc"
+                                                        name="cvcSelected"
                                                         placeholder="XXX"
                                                         className="w-full bg-white border border-stone-200 p-3 text-sm outline-none"
                                                     />
@@ -325,16 +293,11 @@ const {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            {errors.selectedCard && (
-                                <span className="text-red-500 text-sm block mt-2">
-                                    {errors.selectedCard.message}
-                                </span>
-                            )}
+                            </div> */}
 
                             <button type="submit" className="w-full bg-stone-900 text-white py-6 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-soft">
-                                {isSubmitting ? 'Complete Order & Review...' : 'Complete Order & Review'}
+                                {/* {isSubmitting ? 'Complete Order & Review...' : 'Complete Order & Review'} */}
+                                {isSubmitting ? 'Go to pay...' : 'Go to pay'}
                             </button>
                             <p className="text-center text-[10px] text-stone-400 uppercase tracking-widest">
                                 Your transaction is encrypted and secured by ArtisanPay

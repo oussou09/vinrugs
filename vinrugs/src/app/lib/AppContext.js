@@ -21,7 +21,7 @@ export function AppProvider({ children }) {
             setLoadingProd(true);
             const res = await apiClient.get('/rugs');
             const data = res.data;
-            // console.log("data.res", data)
+            console.log("data.res rugs", data)
             setProducts(data);
             setRefreshCount((prevCount) => prevCount + 1);
         } catch (error) {

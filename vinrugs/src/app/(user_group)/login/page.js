@@ -19,9 +19,7 @@ export default function Login(){
             const dataForm = new FormData();
             dataForm.append('email', data.email);
             dataForm.append('password', data.password);
-
             const resp = await apiClient.post('/loginuser' , dataForm)
-
             if(resp.status === 200 || resp.status === 201 ){
                 reset()
                 await checkLogin(resp.data.access_token)
@@ -29,9 +27,8 @@ export default function Login(){
                 toast.success('Login successfully');
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message;
-            toast.error(error,'Something went wrong');
-            console.error('Connection Error:', errorMessage);
+            const errorMessage = error.response?.data?.message || "Something went wrong";
+            toast.error(errorMessage);
             console.log("STATUS:", error.response?.status);
             console.log("DATA:", error.response?.data);
             console.log("FULL ERROR:", error);

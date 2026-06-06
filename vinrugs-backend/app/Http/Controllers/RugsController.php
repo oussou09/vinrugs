@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carts;
+use App\Models\Discount;
 use App\Models\Rugs;
 use App\Models\Rugs_imges;
 use Illuminate\Http\Request;
@@ -136,9 +137,9 @@ public function StoreRug(Request $request)
             ], 422);
         }
 
-        if ($rug->rug_quantity === 0 ) {
+        // if ($rug->rug_quantity === 0 ) {
 
-        }
+        // }
 
         $cartItem = Carts::where('user_id', $user->id)
             ->where('rug_id', $request->rug_id)
@@ -175,11 +176,18 @@ public function StoreRug(Request $request)
      */
     public function CheckoutPayment(Request $request)
     {
+        $user = $request->user()->load('cart_shopping.rug');
+
         Log::info('Incoming Request Data:', $request->all());
 
-        $user = $request->user();
+        Log::info("---------------------------");
 
-        if ((!$request->cardnumber || !$request->expiry || !$request->cvc) && (!$request->idCard || !$request->cvc)) {
+        Log::info($user->cart_shopping);
+
+        $hasSavedCard = $request->filled('idCard') && $request->filled('cvc');
+        $hasNewCard = $request->filled('cardnumber') && $request->filled('expiry') && $request->filled('cvc');
+
+        if (!$hasSavedCard && !$hasNewCard) {
             return response()->json(['message' => 'Card information is required.'], 422);
         }
 
@@ -187,27 +195,64 @@ public function StoreRug(Request $request)
             $validatorData = $request->validate([
                 'Fname' => 'required|string' ,
                 'Lname' => 'required|string' ,
+                'email' => 'required|email',
                 'address' => 'required|string' ,
                 'city' => 'required|string' ,
                 'postal_code' => 'required|string' ,
-                'email' => 'required|email',
                 'DiscountCode' => 'nullable|string' ,
-            ])
+            ]);
 
             // amount calc
 
+            $cartSubtotal = 0;
+            $totalQuantity = 0;
 
+            foreach ($user->cart_shopping as $cartItem) {
+                if ($cartItem->rug) {
+                    $qty = (int) $cartItem->cart_rug_quantity;
+                    $price = (float) $cartItem->rug->rug_price;
 
+                    $cartSubtotal += $price * $qty;
+                    $totalQuantity += $qty;
+                }
+            }
 
+            $shippingPrice = ($cartSubtotal * $totalQuantity) / 100;
+            $priceWithShipping = $cartSubtotal + $shippingPrice;
 
+            $discountCode = $validated['DiscountCode'] ?? null;
+            $discount = $discountCode
+                ? Discount::where('discount_title', $discountCode)->first()
+                : null;
 
+            $discountPercent = (float) ($discount?->discount_porcent ?? 0);
+            $discountAmount = ($priceWithShipping * $discountPercent) / 100;
+            $finalPrice = $priceWithShipping - $discountAmount;
 
+            Log::info('checkout totals', [
+                'cartSubtotal' => $cartSubtotal,
+                'totalQuantity' => $totalQuantity,
+                'shippingPrice' => $shippingPrice,
+                'priceWithShipping' => $priceWithShipping,
+                'discountPercent' => $discountPercent,
+                'discountAmount' => $discountAmount,
+                'finalPrice' => $finalPrice,
+            ]);
 
-
-
-        } catch (\Throwable $th) {
-            //throw $th;
+            return response()->json([
+                'message' => 'Checkout calculated successfully',
+                'subtotal' => $cartSubtotal,
+                'shipping' => $shippingPrice,
+                'discount_percent' => $discountPercent,
+                'discount_amount' => $discountAmount,
+                'final_total' => $finalPrice,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Something went wrong while checkout: ' . $e->getMessage()
+            ], 500);
         }
+
     }
 
     /**
