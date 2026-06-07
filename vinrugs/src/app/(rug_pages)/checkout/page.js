@@ -7,7 +7,8 @@ import { useForm } from "react-hook-form";
 import toast from 'react-hot-toast';
 import styled from "styled-components";
 import Payment from "../payment/page";
-
+import FormCountries from "./formcountries";
+// import FormCountries from "./"
 
 
 
@@ -15,7 +16,7 @@ export default function Checkout(){
 
     const {token, user, loadingAuth, refreshProducts, fetchUserData} = useApp()
     // console.log('token checkout: ',token)
-const {
+    const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -37,14 +38,13 @@ const {
     const [totalPrice, setotalPrice] = useState(0)
     const [discountName, setDiscountName] = useState("")
     const [discountPorcent, setDiscountPorcent] = useState(0)
-    const [selectedCard, setSelectedCard] = useState(null)
+    const [sendDataForm, setSendDataForm] = useState(null)
+    const [isSendDataForm, setIsSendDataForm] = useState(false) 
     const router = useRouter();
 
     console.log('user: ',user)
-    console.log('selectedCard: ',selectedCard)
 
     useEffect(() => {
-
         if (user) {
             reset({
             Fname: user.first_name || "",
@@ -64,28 +64,28 @@ const {
             return;
         }
 
-        const calculatedTotal = user.cart_shopping.reduce((sum, item) => {
+        const cartSubtotal = user.cart_shopping.reduce((sum, item) => {
             const price = Number(item.rug?.rug_price || 0);
             const qty = Number(item.cart_rug_quantity || 0);
             return sum + price * qty;
         }, 0);
 
-        const itemCount = user.cart_shopping.reduce((sum, item) => {
+        const totalQuantity = user.cart_shopping.reduce((sum, item) => {
             return sum + Number(item.cart_rug_quantity || 0);
         }, 0);
 
-        const calculatedShipping = (calculatedTotal * itemCount) / 100;
+        const shippingPrice = (cartSubtotal * totalQuantity) / 100;
+        const beforeDiscount = cartSubtotal + shippingPrice;
 
-        const beforeDiscount = calculatedTotal + calculatedShipping;
         const discountAmount =
-                discountPorcent > 0 ? (beforeDiscount * discountPorcent) / 100 : 0;
+            discountPorcent > 0 ? (beforeDiscount * discountPorcent) / 100 : 0;
 
         const finalTotal = beforeDiscount - discountAmount;
 
-        setTotalPriceRugs(calculatedTotal);
-        setShippinRug(calculatedShipping);
-        setotalPrice(finalTotal);
-    }, [user, discountPorcent]);
+        setTotalPriceRugs(cartSubtotal);
+        setShippinRug(shippingPrice);
+        setotalPrice(finalTotal.toFixed(2));
+    }, [user, discountPorcent, reset]);
 
     const OnsubmitsDiscount = async () => {
 
@@ -114,23 +114,27 @@ const {
         }
     }
 
-    const Onsubmits = async (data) => {
+    const Onsubmits = (data) => {
 
-        const dataForm = new FormData();
-
-            dataForm.append('Fname', data.Fname);
-            dataForm.append('Lname', data.Lname);
-            dataForm.append('email', data.email);
-            dataForm.append('address', data.address);
-            dataForm.append('city', data.city);
-            dataForm.append('postal_code', data.postalcode);
-            dataForm.append("DiscountCode", discountName)
-
-            return(
-            <Payment userdata={dataForm}/>
-            )
-
+        setSendDataForm({
+            Fname: data.Fname,
+            Lname: data.Lname,
+            email: data.email,
+            address: data.address,
+            city: data.city,
+            postal_code: data.postalcode,
+            DiscountCode: discountName || "",
+            discountPorcent: discountPorcent || 0,
+        });
+        setIsSendDataForm(true);
     }
+
+    useEffect(() => {
+        if (sendDataForm) {
+            console.log('sendDataForm updated:', sendDataForm);
+        }
+    }, [sendDataForm]);
+
 
     return(
         // <!-- Checkout Page -->
@@ -140,6 +144,10 @@ const {
                     {/* <!-- Checkout Form --> */}
                     <div className="flex-grow lg:w-3/5">
                         <h1 className="serif text-4xl mb-12">Checkout</h1>
+
+                        {isSendDataForm ? (
+                            <Payment userdata={sendDataForm} />
+                        ) : (
                         
                         <form method="POST" onSubmit={handleSubmit(Onsubmits)} className="space-y-12">
                             {/* <!-- Section: Shipping --> */}
@@ -196,104 +204,11 @@ const {
                                             type="text" className="w-full bg-white border border-stone-200 p-3 text-sm focus:ring-1 focus:ring-stone-900 focus:border-stone-900 outline-none" />
                                             {errors.postalcode && <span className="text-red-500">{errors.postalcode.message}</span>}
                                     </div>
+                                    <div className="col-span-2">
+                                        <FormCountries />
+                                    </div>
                                 </div>
                             </div>
-
-                            {/* <!-- Section: Payment --> */}
-                            {/* <div>
-                                <h3 className="text-xs font-bold uppercase tracking-widest border-b border-stone-200 pb-4">2. Payment Method</h3>
-                                <StyledWrapper>
-                                    {user?.ccusers?.map((cuser, index) => (
-                                        <div key={cuser.id} >
-                                            <div className="rounded-lg p-4 text-black">
-                                                <div className="flex items-center gap-4 mt-2 text-[15px] text-bold opacity-80">
-
-                                                    <label className="uiverse-pixel-radio" key={cuser.id}>
-                                                        <input
-                                                            type="radio"
-                                                            name="pixel-choice"
-                                                            value={cuser.id}
-                                                            checked = {selectedCard == cuser.id}
-                                                            onChange={() => {
-                                                                setSelectedCard(cuser.id);
-                                                                clearErrors("selectedCard");
-                                                            }}
-                                                        />
-                                                    </label>
-
-                                                    <p className="text-sm opacity-80">VISA</p>
-                                                    <span>{cuser.full_name}</span>
-                                                    <span>Exp: {cuser.expiration_date}</span>
-                                                    <span className="text-lg font-mono mt-2">•••• •••• •••• {cuser.card_number.slice(-4)}</span>
-                                                </div>
-                                            </div>
-                                            {selectedCard == cuser.id && (
-                                                <div className={`mt-1 ${index === user?.ccusers?.length - 1 ? 'mb-7' : ''}`}>
-                                                    <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">
-                                                        CVC
-                                                    </label>
-                                                    <input
-                                                        {...register("cvcSelected", {
-                                                            required: "CVC is required",
-                                                            maxLength: {
-                                                                value: 4,
-                                                                message: "CVC cannot exceed 4 digits",
-                                                            },
-                                                            minLength: {
-                                                                value: 3,
-                                                                message: "CVC must be at least 3 digits",
-                                                            },
-                                                            pattern: {
-                                                                value: /^[0-9]+$/,
-                                                                message: "Only numbers are allowed",
-                                                            },
-                                                        })}
-                                                        type="number"
-                                                        name="cvcSelected"
-                                                        placeholder="XXX"
-                                                        className="w-full bg-white border border-stone-200 p-3 text-sm outline-none"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </StyledWrapper>
-                                <div className="bg-stone-50 p-6 space-y-6">
-                                    <div className="flex items-center justify-between border-b border-stone-200 pb-4">
-                                        <span className="text-sm font-medium">Credit / Debit Card</span>
-                                        <div className="flex space-x-2">
-                                            <div className="w-8 h-5 bg-white border border-stone-200 rounded"></div>
-                                            <div className="w-8 h-5 bg-white border border-stone-200 rounded"></div>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="col-span-2">
-                                            <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Card Number</label>
-                                            <input
-                                                { ...register ("cardnumber")}
-                                                name="cardnumber"
-                                                type="text" placeholder="XXXX XXXX XXXX XXXX" className="w-full bg-white border border-stone-200 p-3 text-sm outline-none" />
-                                                
-                                        </div>
-                                        <div className="col-span-1">
-                                            <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Expiry</label>
-                                            <input
-                                                { ...register ("expiry")}
-                                                name="expiry"
-                                                type="text" placeholder="MM/YY" className="w-full bg-white border border-stone-200 p-3 text-sm outline-none" />
-                                                
-                                        </div>
-                                        <div className="col-span-1">
-                                            <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">CVC</label>
-                                            <input
-                                                { ...register ("cvc")}
-                                                name="cvc"
-                                                type="text" placeholder="XXX" className="w-full bg-white border border-stone-200 p-3 text-sm outline-none" />
-                                                
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> */}
 
                             <button type="submit" className="w-full bg-stone-900 text-white py-6 text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-soft">
                                 {/* {isSubmitting ? 'Complete Order & Review...' : 'Complete Order & Review'} */}
@@ -303,6 +218,8 @@ const {
                                 Your transaction is encrypted and secured by ArtisanPay
                             </p>
                         </form>
+
+                        )}
                     </div>
 
                     {/* <!-- Order Sidebar --> */}
@@ -477,3 +394,106 @@ const StyledWrapper = styled.div`
     outline: 2px dashed #fff;
     outline-offset: 0.2em;
   }`;
+
+
+
+
+
+
+
+{/* <!-- Section: Payment --> */}
+{/* <div>
+    <h3 className="text-xs font-bold uppercase tracking-widest border-b border-stone-200 pb-4">2. Payment Method</h3>
+    <StyledWrapper>
+        {user?.ccusers?.map((cuser, index) => (
+            <div key={cuser.id} >
+                <div className="rounded-lg p-4 text-black">
+                    <div className="flex items-center gap-4 mt-2 text-[15px] text-bold opacity-80">
+
+                        <label className="uiverse-pixel-radio" key={cuser.id}>
+                            <input
+                                type="radio"
+                                name="pixel-choice"
+                                value={cuser.id}
+                                checked = {selectedCard == cuser.id}
+                                onChange={() => {
+                                    setSelectedCard(cuser.id);
+                                    clearErrors("selectedCard");
+                                }}
+                            />
+                        </label>
+
+                        <p className="text-sm opacity-80">VISA</p>
+                        <span>{cuser.full_name}</span>
+                        <span>Exp: {cuser.expiration_date}</span>
+                        <span className="text-lg font-mono mt-2">•••• •••• •••• {cuser.card_number.slice(-4)}</span>
+                    </div>
+                </div>
+                {selectedCard == cuser.id && (
+                    <div className={`mt-1 ${index === user?.ccusers?.length - 1 ? 'mb-7' : ''}`}>
+                        <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">
+                            CVC
+                        </label>
+                        <input
+                            {...register("cvcSelected", {
+                                required: "CVC is required",
+                                maxLength: {
+                                    value: 4,
+                                    message: "CVC cannot exceed 4 digits",
+                                },
+                                minLength: {
+                                    value: 3,
+                                    message: "CVC must be at least 3 digits",
+                                },
+                                pattern: {
+                                    value: /^[0-9]+$/,
+                                    message: "Only numbers are allowed",
+                                },
+                            })}
+                            type="number"
+                            name="cvcSelected"
+                            placeholder="XXX"
+                            className="w-full bg-white border border-stone-200 p-3 text-sm outline-none"
+                        />
+                    </div>
+                )}
+            </div>
+        ))}
+    </StyledWrapper>
+    <div className="bg-stone-50 p-6 space-y-6">
+        <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+            <span className="text-sm font-medium">Credit / Debit Card</span>
+            <div className="flex space-x-2">
+                <div className="w-8 h-5 bg-white border border-stone-200 rounded"></div>
+                <div className="w-8 h-5 bg-white border border-stone-200 rounded"></div>
+            </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Card Number</label>
+                <input
+                    { ...register ("cardnumber")}
+                    name="cardnumber"
+                    type="text" placeholder="XXXX XXXX XXXX XXXX" className="w-full bg-white border border-stone-200 p-3 text-sm outline-none" />
+                    
+            </div>
+            <div className="col-span-1">
+                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Expiry</label>
+                <input
+                    { ...register ("expiry")}
+                    name="expiry"
+                    type="text" placeholder="MM/YY" className="w-full bg-white border border-stone-200 p-3 text-sm outline-none" />
+                    
+            </div>
+            <div className="col-span-1">
+                <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">CVC</label>
+                <input
+                    { ...register ("cvc")}
+                    name="cvc"
+                    type="text" placeholder="XXX" className="w-full bg-white border border-stone-200 p-3 text-sm outline-none" />
+                    
+            </div>
+        </div>
+    </div>
+</div> */}
+

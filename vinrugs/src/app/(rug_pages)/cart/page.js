@@ -19,32 +19,32 @@ export default function Card(){
 
     console.log(user?.cart_shopping?.[0]?.rug?.rug_imges?.[0]?.main_rug_path);
 
-    useEffect(()=>{
-
+    useEffect(() => {
         if (!user?.cart_shopping || user.cart_shopping.length === 0) {
             setTotalPriceRugs(0);
             setShippinRug(0);
+            setotalPrice(0);
             return;
         }
 
-        // 2. Calculate total price using a local variable (synchronous)
-        const calculatedTotal = user.cart_shopping.reduce((sum, item) => {
+        const cartSubtotal = user.cart_shopping.reduce((sum, item) => {
             const price = Number(item.rug?.rug_price || 0);
             const qty = Number(item.cart_rug_quantity || 0);
             return sum + price * qty;
         }, 0);
 
-        // 3. Calculate shipping using the fresh local variable
-        const itemCount = user.cart_shopping.length;
-        const calculatedShipping = (calculatedTotal * itemCount) / 100;
+        const totalQuantity = user.cart_shopping.reduce((sum, item) => {
+            const qty = Number(item.cart_rug_quantity || 0);
+            return sum + qty;
+        }, 0);
 
-        // 4. Update both states exactly once
-        setTotalPriceRugs(calculatedTotal);
-        setShippinRug(calculatedShipping);
+        const shippingPrice = (cartSubtotal * totalQuantity) / 100;
+        const priceWithShipping = cartSubtotal + shippingPrice;
 
-        setotalPrice(calculatedTotal+calculatedShipping);
-
-    },[user])
+        setTotalPriceRugs(cartSubtotal);
+        setShippinRug(shippingPrice);
+        setotalPrice(priceWithShipping);
+    }, [user]);
 
         console.log('totalPrice ',totalPrice)
         console.log('shippinRug ', shippinRug)

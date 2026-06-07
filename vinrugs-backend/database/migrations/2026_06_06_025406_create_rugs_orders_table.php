@@ -11,8 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rugs_orders', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('stripe_payment_intent_id')->nullable()->unique();
+            $table->string('status')->default('pending');
+            $table->decimal('submount', 10, 2)->default(0);
+            $table->decimal('shipping_price', 10, 2)->default(0);
+            $table->string('discount_name')->nullable();
+            $table->string('discount_porcent')->default(0)->nullable();
+            $table->decimal('discount_mount', 10, 2)->default(0)->nullable();
+            $table->decimal('total_amount', 10, 2)->default(0);
+
+            $table->string('shipping_name');
+            $table->string('shipping_adress');
+            $table->string('shipping_city');
+            $table->string('shipping_postalcode');
+            $table->string('shipping_country')->default('US');
             $table->timestamps();
         });
     }
@@ -22,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rugs_orders');
+        Schema::dropIfExists('orders');
     }
 };

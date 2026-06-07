@@ -32,4 +32,9 @@ class Rugs extends Model
         return $this->belongsToMany(User::class, 'wishlists', 'rug_id', 'user_id')
                     ->withTimestamps();
     }
+
+    public function order_items()
+    {
+        return $this->hasMany(OrderItems::class, 'rug_id');
+    }
 }

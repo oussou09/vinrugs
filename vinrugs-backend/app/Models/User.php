@@ -54,4 +54,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Rugs::class, 'wishlists', 'user_id', 'rug_id')
                     ->withTimestamps();
     }
+
+    public function rugs_orders()
+    {
+        return $this->hasMany(RugsOrders::class, 'user_id');
+    }
 }
