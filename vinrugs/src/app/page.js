@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
 import styles from "./page.module.css";
-import { useApp } from "./lib/AppContext";
+import { useAppUser } from "./lib/AppContext";
 
 export default function Home() {
 
-    const {products = [], loading, user} = useApp();
+    const {products = [], loading} = useAppUser();
     console.log('product ', products)
     
     const tree_rugs = products

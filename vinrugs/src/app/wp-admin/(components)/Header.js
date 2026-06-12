@@ -1,5 +1,11 @@
+"use client";
+import { useAppAdmin } from "../AdminLib/AppContextAdmin"
+
 // app/admin/Header.js
-export default function Header({ onMenuClick }) {
+export default function Header() {
+
+  const { adminInfos } = useAppAdmin();
+
   return (
     <header className="bg-white shadow-sm border-b border-[#eddcc9] h-16 flex items-center justify-between px-4 md:px-6">
       <button className="lg:hidden p-2 rounded-md text-[#7B542F] hover:bg-[#fdf6ec]">
@@ -9,7 +15,7 @@ export default function Header({ onMenuClick }) {
       </button>
       <div className="flex-1" />
       <div className="flex items-center space-x-4">
-        <span className="text-sm text-[#5a3e24] hidden sm:block">Admin User</span>
+        <span className="text-sm text-[#5a3e24] hidden sm:block">Admin ({adminInfos?.fullname})</span>
         <div className="h-9 w-9 rounded-full bg-[#FFCF71] flex items-center justify-center text-white font-medium">
           A
         </div>

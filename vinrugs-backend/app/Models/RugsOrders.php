@@ -19,6 +19,7 @@ class RugsOrders extends Model
         'discount_mount',
         'total_amount',
         'shipping_name',
+        'shipping_user_mail',
         'shipping_adress',
         'shipping_city',
         'shipping_postalcode',
@@ -26,7 +27,7 @@ class RugsOrders extends Model
     ];
 
     public function order_items() {
-        return $this->hasMany(OrderItems::class);
+        return $this->hasMany(OrderItems::class, 'order_id');
     }
 
     public function user()

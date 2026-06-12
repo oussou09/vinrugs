@@ -29,14 +29,14 @@ class UserController extends Controller
             'password' => 'required|min:6|regex:/^(?=.*[a-z])(?=.*[0-9]).+$/i'
         ]);
 
-        if (!Auth::attempt($validationdata)) {
+        if (!Auth::guard('user')->attempt($validationdata)) {
             return response()->json([
                 'message' => 'user ' .$request->email. ' not Found' ,
             ],404);
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = Auth::guard('user')->user();
+        $token = $user->createToken('user_token', ['user'])->plainTextToken;
 
         return response()->json([
             'message' => 'Login Seccessfully',
@@ -101,16 +101,6 @@ class UserController extends Controller
                 'file' => $e->getFile(),
             ], 500);
         }
-    }
-
-    /**
-     * Logout the specified resource.
-     */
-    public function LogoutUser(Request $request)
-    {
-        $user = $request->user();
-        $user->currentAccessToken()->delete();
-        return response()->json(['message' => "user {$user->first_name} {$user->last_name} Logout seccesfully"]);
     }
 
     /**
@@ -203,10 +193,22 @@ class UserController extends Controller
     }
 
     /**
+     * Logout the specified resource.
+     */
+    public function LogoutUser(Request $request)
+    {
+        $user = $request->user();
+        $user->currentAccessToken()->delete();
+        return response()->json(['message' => "user {$user->first_name} {$user->last_name} Logout seccesfully"]);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
         //
     }
+
+
 }

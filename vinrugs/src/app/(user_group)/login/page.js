@@ -1,9 +1,8 @@
 "use client";
-
 import { apiClient } from "@/app/lib/api";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useApp } from "@/app/lib/AppContext";
+import { useAppUser } from "@/app/lib/AppContext";
 import toast from 'react-hot-toast';
 
 
@@ -12,7 +11,7 @@ export default function Login(){
 
     const {register, handleSubmit, formState : {errors, isSubmitting}, reset} = useForm()
     const router = useRouter();
-    const {checkLogin} = useApp()
+    const {checkUserLogin} = useAppUser()
 
     const Submits = async (data) => {
         try {
@@ -22,7 +21,7 @@ export default function Login(){
             const resp = await apiClient.post('/loginuser' , dataForm)
             if(resp.status === 200 || resp.status === 201 ){
                 reset()
-                await checkLogin(resp.data.access_token)
+                await checkUserLogin(resp.data.access_token)
                 router.push('/rugs')
                 toast.success('Login successfully');
             }

@@ -1,6 +1,7 @@
 "use client";
 import { apiClient } from "@/app/lib/api";
 import { useApp } from "@/app/lib/AppContext"
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -128,9 +129,9 @@ export default function Card(){
                                     <h3 className="text-lg font-medium text-stone-900">Your Cart Is Empty</h3>
                                     <p className="text-sm text-stone-400 mt-1 max-w-xs mx-auto">You haven&apos;t added any vintage rugs to your cart yet.</p>
                                 </div>
-                                <a href="#" className="mt-2 px-6 py-2.5 bg-stone-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-stone-700 transition-soft">
+                                <Link href="/rugs" className="mt-2 px-6 py-2.5 bg-stone-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-stone-700 transition-soft">
                                     Browse Collection
-                                </a>
+                                </Link>
                             </div>
                             )
                             :

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('total_amount', 10, 2)->default(0);
 
             $table->string('shipping_name');
+            $table->string('shipping_user_mail');
             $table->string('shipping_adress');
             $table->string('shipping_city');
             $table->string('shipping_postalcode');

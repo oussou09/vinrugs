@@ -2,40 +2,15 @@
 import Asideprofile from "@/app/(user_group)/asideprofile";
 import { apiClient } from "@/app/lib/api";
 import { useApp } from "@/app/lib/AppContext";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
 
 
 export default function Wishlist(){
 
-const wishlistItems = [
-  {
-    id: 1,
-    name: 'Isfahan Silk Medallion',
-    price: '$1,280',
-    image: 'https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&q=80&w=600',
-  },
-  {
-    id: 2,
-    name: 'Persian Wool Runner',
-    price: '$890',
-    image: 'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&q=80&w=600',
-  },
-  {
-    id: 3,
-    name: 'Turkish Kilim Geometric',
-    price: '$650',
-    image: 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?auto=format&fit=crop&q=80&w=600',
-  },
-  {
-    id: 4,
-    name: 'Moroccan Boujad Vintage',
-    price: '$1,450',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=600',
-  },
-]
-
     const {user, products, token, refreshProducts, fetchUserData, loadingAuth} = useApp()
-
+    const router = useRouter()
     console.log(user)
 
 
@@ -85,7 +60,7 @@ const wishlistItems = [
           {/* Main Content Area */}
           <div className="flex-grow">
             <h1 className="serif text-5xl mb-4 italic text-[#7B542F]">Your Curated Collection</h1>
-            <p className="text-stone-400 tracking-wide uppercase text-xs font-bold">{wishlistItems.length} Pieces Saved</p>
+            <p className="text-stone-400 tracking-wide uppercase text-xs font-bold">{user?.rugs?.length} Pieces Saved</p>
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
               { loadingAuth ?
@@ -116,9 +91,9 @@ const wishlistItems = [
                       <h3 className="text-sm font-bold uppercase tracking-widest text-[#7B542F] mb-1">No Saved Items</h3>
                       <p className="text-xs text-stone-400 max-w-xs mx-auto">Your wishlist is empty. Start curating your vintage rug collection.</p>
                     </div>
-                    <a href="/rugs" className="mt-2 px-6 py-2.5 bg-[#FF9D00] text-white text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-[#b8871a] transition-colors">
+                    <Link href='/rugs' className="mt-2 px-6 py-2.5 bg-[#FF9D00] text-white text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-[#b8871a] transition-colors">
                       Browse Collection
-                    </a>
+                    </Link>
                   </div>
                 )
                 :

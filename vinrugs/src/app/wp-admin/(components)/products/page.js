@@ -1,7 +1,37 @@
+"use client";
 import Link from "next/link";
+import { useAppAdmin } from "../../AdminLib/AppContextAdmin";
+import { apiClient } from "@/app/lib/api";
+import toast from "react-hot-toast";
 
 // components/admin/ProductManager.js
 export default function ProductManager() {
+
+  const {AdProducts, AdProductsLoad, adminToken, refetchProducts} = useAppAdmin()
+
+  console.log('AdProducts from products page: ',AdProducts)
+
+  const HandleDelete = async (IdRug) => {
+
+    try {
+      
+      const resp = await apiClient.post('/admin/deleterug', {id: IdRug}, {
+        headers:{
+          Authorization:adminToken
+        }
+      })
+
+      if (resp.status === 200) {
+        toast.success(resp.data.message);
+        await refetchProducts();
+      }
+
+    } catch (error) {
+      toast.error(error || "Someting Wrong");
+      console.error("Error fetching data ", error);
+    }
+  }
+
   return (
     <div className="bg-white rounded-xl shadow border border-[#eddcc9] overflow-hidden">
       <div className="p-4 border-b border-[#f0e4d3] flex justify-between items-center">
@@ -13,43 +43,71 @@ export default function ProductManager() {
           <thead className="bg-[#fdf6ec] text-[#B6771D]">
             <tr>
               <th className="px-5 py-3">Image</th>
-              <th className="px-5 py-3">Name</th>
+              <th className="px-5 py-3">Title</th>
               <th className="px-5 py-3">Price</th>
               <th className="px-5 py-3">Stock</th>
               <th className="px-5 py-3">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-t border-[#f0e4d3] hover:bg-[#fdf6ec]">
-              <td className="px-5 py-3"><div className="h-12 w-12 rounded-lg bg-[#f0e4d3] flex items-center justify-center text-[#7B542F]">🧶</div></td>
-              <td className="px-5 py-3 font-medium text-[#7B542F]">Persian Wool Rug</td>
-              <td className="px-5 py-3">$450</td>
-              <td className="px-5 py-3"><span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">12 left</span></td>
-              <td className="px-5 py-3 space-x-2">
-                <button className="text-[#B6771D] hover:text-[#FF9D00] font-medium">Edit</button>
-                <button className="text-red-500 hover:text-red-700 font-medium">Delete</button>
-              </td>
-            </tr>
-            <tr className="border-t border-[#f0e4d3] hover:bg-[#fdf6ec]">
-              <td className="px-5 py-3"><div className="h-12 w-12 rounded-lg bg-[#f0e4d3] flex items-center justify-center text-[#7B542F]">🧶</div></td>
-              <td className="px-5 py-3 font-medium text-[#7B542F]">Turkish Kilim</td>
-              <td className="px-5 py-3">$320</td>
-              <td className="px-5 py-3"><span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">8 left</span></td>
-              <td className="px-5 py-3 space-x-2">
-                <button className="text-[#B6771D] hover:text-[#FF9D00] font-medium">Edit</button>
-                <button className="text-red-500 hover:text-red-700 font-medium">Delete</button>
-              </td>
-            </tr>
-            <tr className="border-t border-[#f0e4d3] hover:bg-[#fdf6ec]">
-              <td className="px-5 py-3"><div className="h-12 w-12 rounded-lg bg-[#f0e4d3] flex items-center justify-center text-[#7B542F]">🧶</div></td>
-              <td className="px-5 py-3 font-medium text-[#7B542F]">Moroccan Boujad</td>
-              <td className="px-5 py-3">$690</td>
-              <td className="px-5 py-3"><span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">3 left</span></td>
-              <td className="px-5 py-3 space-x-2">
-                <button className="text-[#B6771D] hover:text-[#FF9D00] font-medium">Edit</button>
-                <button className="text-red-500 hover:text-red-700 font-medium">Delete</button>
-              </td>
-            </tr>
+            { AdProductsLoad ?
+            (
+              <tr className="border-t border-[#f0e4d3] animate-pulse">
+                <td className="px-5 py-3">
+                  <div className="h-12 w-12 rounded-lg bg-[#f0e4d3]" />
+                </td>
+                <td className="px-5 py-3">
+                  <div className="h-4 w-36 bg-[#f0e4d3] rounded" />
+                </td>
+                <td className="px-5 py-3">
+                  <div className="h-3 w-14 bg-[#f5e6d3] rounded" />
+                </td>
+                <td className="px-5 py-3">
+                  <div className="h-5 w-14 bg-[#f0e4d3] rounded-full" />
+                </td>
+                <td className="px-5 py-3">
+                  <div className="flex space-x-2">
+                    <div className="h-3 w-10 bg-[#f5e6d3] rounded" />
+                    <div className="h-3 w-12 bg-[#f5e6d3] rounded" />
+                  </div>
+                </td>
+              </tr>
+            )
+            : ! AdProducts?.length === 0 ?
+            (
+              <tr>
+                <td colSpan="5" className="px-5 py-12">
+                  <div className="flex flex-col items-center justify-center gap-3 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-[#d4c4a8]">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                      <line x1="12" y1="22.08" x2="12" y2="12"/>
+                    </svg>
+                    <div>
+                      <h3 className="font-semibold text-[#7B542F] text-sm">No Products Found</h3>
+                      <p className="text-xs text-stone-400 mt-1">Add your first vintage rug to the collection.</p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            )
+            :
+            (
+              <>
+              { AdProducts?.map((AdProduct) => (
+                  <tr key={AdProduct.id} className="border-t-3 border-[#f0e4d3] hover:bg-[#fdf6ec]">
+                    <td className="px-5 py-2"><div className="h-12 w-12 rounded-lg bg-[#f0e4d3] flex items-center justify-center text-[#7B542F]">🧶</div></td>
+                    <td className="px-5 py-2 font-medium text-[#7B542F]">{AdProduct.rug_title}</td>
+                    <td className="px-5 py-2">${AdProduct.rug_price}</td>
+                    <td className="px-5 py-2"><span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">{AdProduct.rug_quantity <= 0 ? 'ullimited' : `${AdProduct.rug_quantity} left`}</span></td>
+                    <td className="px-5 py-2 space-x-2">
+                      <button disabled title="Not Allowed Yet" className="text-[#B6771D] hover:text-[#FF9D00] font-medium">Edit</button>
+                      <button onClick={() => HandleDelete(AdProduct.id)} className="text-red-500 hover:text-red-700 font-medium">Delete</button>
+                    </td>
+                  </tr>
+              )) }
+              </>
+            )}
           </tbody>
         </table>
       </div>

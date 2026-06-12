@@ -80,7 +80,7 @@ export function AppProvider({ children }) {
         fetchUserData(token);
     };
 
-    const checkLogin =  async (newToken) => {
+    const checkUserLogin =  async (newToken) => {
         localStorage.setItem('token' , newToken)
         setToken(newToken);
         console.log("token login check ", token);
@@ -99,11 +99,11 @@ export function AppProvider({ children }) {
                                       cart, setCart, loadingProd,
                                       refreshProducts, refreshCount,
                                       fetchUserData, user, loadingAuth, token,
-                                      refetchUserData, checkLogin, checkLogout
+                                      refetchUserData, checkUserLogin, checkLogout
                                     }}>
             {children}
         </AppContext.Provider>
     );
 }
 
-export const useApp = () => useContext(AppContext);
+export const useAppUser = () => useContext(AppContext);

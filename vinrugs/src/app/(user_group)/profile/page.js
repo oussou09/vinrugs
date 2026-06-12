@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Asideprofile from "../asideprofile";
-import { useApp } from "@/app/lib/AppContext";
+import { useAppUser } from "@/app/lib/AppContext";
 
 
 
@@ -9,7 +9,7 @@ import { useApp } from "@/app/lib/AppContext";
 
 export default function Profile(){
 
-    const {user, loadingAuth} = useApp()
+    const {user, loadingAuth} = useAppUser()
 
     
 

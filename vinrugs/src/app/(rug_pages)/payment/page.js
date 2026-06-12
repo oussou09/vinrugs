@@ -20,7 +20,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
     function PaymentForm({ userdata }) {
         const stripe = useStripe();
         const elements = useElements();
-        const { token } = useApp();
+        const { token, refetchUserData, refreshProducts } = useApp();
         const router = useRouter();
         const [loading, setLoading] = useState(false);
 
@@ -57,21 +57,26 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
             dataForm.append("address",      userdata.address);
             dataForm.append("city",         userdata.city);
             dataForm.append("postal_code",  userdata.postal_code);
+            dataForm.append("VarCountrie",  userdata.VarCountrie);
             dataForm.append("DiscountCode", userdata.DiscountCode || "");
             dataForm.append("card_token",   cardToken.id);
 
 
-            const resp = await apiClient.post("/checkoutpayment", dataForm, {
+            const resp = await apiClient.post("/storeorders", dataForm, {
                 headers: { Authorization: token },
             });
 
             if (resp.status === 200) {
+                await refetchUserData();
+                await refreshProducts();
                 toast.success("Payment successful!");
                 router.push("/cart");
             }
             } catch (error) {
                 const msg = error.response?.data?.message || error.message;
-                toast.error(msg || "Payment failed");
+                const msgerr = error.response?.data?.error || error.error;
+                toast.error(msg);// || "Payment failed"
+                toast.error(msgerr);// || "Payment failed"
             } finally {
                 setLoading(false);
             }

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useApp } from "./lib/AppContext";
+import { useAppUser } from "./lib/AppContext";
 
 export default function Navbar(){
 
     const [isLogin , setIsLogin] = useState(false)
     
-    const {user, token} = useApp()
+    const {user, token} = useAppUser()
 
 
 

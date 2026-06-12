@@ -2,7 +2,7 @@
 
 
 
-export default function FormCountries(params) {
+export default function FormCountries({VarCountrie}) {
     
     const countries = [
         {"name": "Albania", "code": "AL"},
@@ -256,11 +256,16 @@ export default function FormCountries(params) {
     ]
     return(
         <>
-            <label for="underline_select" class="sr-only">Underline select</label>
-            <select id="underline_select" class="block py-2.5 ps-0 w-full text-sm text-body bg-transparent border-0 border-b-2 border-default-medium appearance-none focus:outline-none focus:ring-0 focus:border-brand peer">
-                <option selected>Choose a country</option>
-                {countries.map((countrie)=>(
-                    <option value={countrie.code}>{countrie.name}</option>
+            <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">Countries</label>
+            <label htmlFor="countries" className="sr-only">Underline select</label>
+            <select
+                {...VarCountrie("countries", { required: "Country is required" })}
+                name="countries"
+                id="countries"
+                className="block py-2.5 ps-0 w-full text-sm text-body bg-transparent border-0 border-b-2 border-default-medium appearance-none focus:outline-none focus:ring-0 focus:border-brand peer">
+                <option>Choose Your Country</option>
+                {countries.map((countrie, index)=>(
+                    <option key={index} value={countrie.code}>{countrie.name}</option>
                 ))}
             </select>
         </>

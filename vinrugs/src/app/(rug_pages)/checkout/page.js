@@ -11,7 +11,6 @@ import FormCountries from "./formcountries";
 // import FormCountries from "./"
 
 
-
 export default function Checkout(){
 
     const {token, user, loadingAuth, refreshProducts, fetchUserData} = useApp()
@@ -30,6 +29,7 @@ export default function Checkout(){
             address: "",
             city: "",
             postalcode: "",
+            VarCountrie: "US",
             DiscountCode: "",
         },
     });
@@ -53,6 +53,7 @@ export default function Checkout(){
             address: "",
             city: "",
             postalcode: "",
+            VarCountrie: "",
             DiscountCode: "",
             });
         }
@@ -114,6 +115,12 @@ export default function Checkout(){
         }
     }
 
+    const DeleteDiscount = () => {
+        setDiscountPorcent(0);
+        const inputDiscount = document.querySelector('input[name="DiscountCode"]')
+        inputDiscount.value = "";
+    }
+
     const Onsubmits = (data) => {
 
         setSendDataForm({
@@ -123,6 +130,7 @@ export default function Checkout(){
             address: data.address,
             city: data.city,
             postal_code: data.postalcode,
+            VarCountrie: data.countries,
             DiscountCode: discountName || "",
             discountPorcent: discountPorcent || 0,
         });
@@ -205,7 +213,10 @@ export default function Checkout(){
                                             {errors.postalcode && <span className="text-red-500">{errors.postalcode.message}</span>}
                                     </div>
                                     <div className="col-span-2">
-                                        <FormCountries />
+                                        <FormCountries VarCountrie={register} />
+                                        {errors.countries && (
+                                        <p className="text-red-500 text-sm">{errors.countries.message}</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -271,10 +282,13 @@ export default function Checkout(){
 
                             { discountPorcent ?
                             (
-                            <div className="border-t border-stone-200">
-                                <p className="block text-[20px] text-center font-bold uppercase tracking-widest text-green-500 mt-2">
+                            <div className="flex items-center justify-center border-t border-stone-200 pt-3">
+                                <p className="block text-[20px] text-center font-bold uppercase tracking-widest text-green-500">
                                     {discountName} {discountPorcent}%
                                 </p>
+                                <button onClick={DeleteDiscount}>
+                                    <img src="/icons/delete-bin.png" className="h-6 w-6 ml-3" alt="Delete" />
+                                </button>
                             </div>
                             ) : null
                             }
@@ -320,7 +334,6 @@ export default function Checkout(){
                 </div>
             </div>
         </section>
-
     )
 }
 

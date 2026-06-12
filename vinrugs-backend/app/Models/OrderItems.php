@@ -10,7 +10,7 @@ class OrderItems extends Model
     protected $fillable = ['order_id' , 'rug_id' , 'order_rug_quantity' , 'order_rug_price' , 'order_total_price'];
 
     public function rugs_orders() {
-        return $this->belongsTo(RugsOrders::class);
+        return $this->belongsTo(RugsOrders::class, 'order_id');
     }
 
     public function rug()
