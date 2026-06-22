@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from './api';
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const AppContext = createContext();
 
@@ -14,12 +14,13 @@ export function AppProvider({ children }) {
     const [token, setToken] = useState(null)
     const [refreshCount, setRefreshCount] = useState(0);
     const router = useRouter()
+    const pathname = useParams();
 
     // جلب البيانات مرة واحدة فقط عند إقلاع التطبيق
     const fetchInitialData = async () => {
         try {
             setLoadingProd(true);
-            const res = await apiClient.get('/rugs');
+            const res = await apiClient.get('/user/rugs');
             const data = res.data;
             console.log("data.res rugs", data)
             setProducts(data);
@@ -42,7 +43,7 @@ export function AppProvider({ children }) {
 
         try {
             setLoadingAuth(true)
-            const RespUser = await apiClient.get('/getuser', {
+            const RespUser = await apiClient.get('/user/getuser', {
                 headers: {
                     Authorization: authToken,
                 },
@@ -63,13 +64,17 @@ export function AppProvider({ children }) {
         fetchInitialData();
         const storedToken = localStorage.getItem('token');
 
+        if (!storedToken && pathname == '/signup') {
+            return router.push('/login');
+        }
+
         if (storedToken) {
             setToken(storedToken);
             fetchUserData(storedToken);
         } else {
             setLoadingAuth(false);
         }
-    }, []); // مصفوفة فارغة تعني: اشتغل مرة واحدة فقط (Once)
+    }, []);
 
     // دالة تُستدعى يدوياً فقط عند الإضافة أو الحذف أو التعديل لrefresh البيانات
     const refreshProducts = () => {
@@ -87,16 +92,24 @@ export function AppProvider({ children }) {
         await fetchUserData(newToken)
     }
 
-    const checkLogout = () => {
+    const checkLogout = async () => {
+        const storedToken = localStorage.getItem('token');
+
+        await apiClient.post('/user/logoutuser', {
+            headers: {
+                Authorization:storedToken,
+            }
+        })
+
         localStorage.removeItem("token");
         setToken(null);
         setUser(null);
-  };
+    };
 
 
     return (
-        <AppContext.Provider value={{ products, setProducts,
-                                      cart, setCart, loadingProd,
+        <AppContext.Provider value={{ products, setProducts, loadingProd,
+                                      cart, setCart,
                                       refreshProducts, refreshCount,
                                       fetchUserData, user, loadingAuth, token,
                                       refetchUserData, checkUserLogin, checkLogout

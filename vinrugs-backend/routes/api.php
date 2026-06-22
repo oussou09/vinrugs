@@ -15,7 +15,6 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 
-Route::get('/rugs',[RugsController::class, 'IndexRugs']);
 
 
 
@@ -26,6 +25,7 @@ Route::prefix('user')->group(function (){
 
     Route::post('/contactus',[ContactUsController::class, 'StoreContact']);
     Route::post('/mailnewsletter',[MailNewsLetterController::class, 'StoreMNL']);
+    Route::get('/rugs',[RugsController::class, 'IndexRugs']);
 
     Route::middleware(['auth:sanctum', 'abilities:user'])->group(function () {
         Route::get('/getuser',[UserController::class ,'ShowUser']);
@@ -47,6 +47,7 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware(['auth:sanctum', 'abilities:admin'])->group(function () {
         Route::get('/admininfos', [AdminsController::class, 'AdminInfos']);
+        Route::post('/logoutadmin', [AdminsController::class, 'LogoutAdmin']);
         Route::get('/contacts', [ContactUsController::class, 'GetContacts']);
         Route::get('/getusers', [AdminsController::class, 'GetUsers']);
         Route::get('/getadproducts',[AdminsController::class, 'GetProducts']);

@@ -39,6 +39,14 @@ class AdminsController extends Controller
 
     }
 
+    public function LogoutAdmin(Request $request) {
+
+        $admin = Auth::guard('admin')->user();
+        $admin->currentAccessToken()->delete();
+        return response()->json(['message' => "admin {$admin->fullname} Logout seccesfully"],200);
+
+    }
+
     public function AdminInfos(Request $request)
     {
         $admin = $request->user();

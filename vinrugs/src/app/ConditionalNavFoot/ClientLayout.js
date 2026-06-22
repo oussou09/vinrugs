@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
-  const hideLayout = pathname.startsWith('/wp-admin');
+  const hideLayout = pathname.startsWith('/wp-admin') || pathname.startsWith('/unauthorized');
 
   return (
     <AppProvider>

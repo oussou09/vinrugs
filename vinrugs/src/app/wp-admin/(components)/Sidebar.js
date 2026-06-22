@@ -1,13 +1,25 @@
 // app/admin/Sidebar.js
 'use client';
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { useAppAdmin } from '../AdminLib/AppContextAdmin';
 
 export default function Sidebar() {
 
-
-
+  const { AdminLogout } = useAppAdmin()
   const rpath = usePathname();
+
+  const HadleLogout = async () => {
+
+    try {
+      await AdminLogout();
+    } catch (error) {
+        console.error(error);
+        toast.error(error,'Something went wrong');
+      }
+    }
+
 
   return (
     <aside className="w-64 bg-[#fff8f1] text-white flex flex-col flex-shrink-0">
@@ -41,6 +53,12 @@ export default function Sidebar() {
         >
           <span className="mr-3 text-lg">✉️</span> Contacts
         </Link>
+        <button
+          onClick={() => HadleLogout()}
+          className="flex items-center px-4 py-3 rounded-lg text-lg font-medium text-[#e7d7c1] hover:underline hover:decoration-red-500 hover:text-red-600"
+        >
+          Logout Admin
+        </button>
       </nav>
     </aside>
   )

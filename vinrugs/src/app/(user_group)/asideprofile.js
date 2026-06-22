@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useApp } from "../lib/AppContext";
+import { useAppUser } from "../lib/AppContext";
 import { apiClient } from "../lib/api";
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
@@ -12,10 +12,9 @@ import toast from 'react-hot-toast';
 export default function Asideprofile() {
     
     const router = useRouter()
-    const {user, token, checkLogout} = useApp()
+    const {user, token, checkLogout} = useAppUser()
 
-    const onSubmit = async (e) => {
-        e.preventDefault();
+    const onSubmit = async () => {
         try {
             await checkLogout();
             router.push('/rugs')

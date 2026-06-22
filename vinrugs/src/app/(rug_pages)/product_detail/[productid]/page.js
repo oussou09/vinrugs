@@ -1,6 +1,6 @@
 "use client";
 import { apiClient } from "@/app/lib/api";
-import { useApp } from "@/app/lib/AppContext";
+import { useAppUser } from "@/app/lib/AppContext";
 import { useParams } from "next/navigation";
 import toast from 'react-hot-toast';
 import { useForm } from "react-hook-form";
@@ -11,7 +11,7 @@ export default function ProductDetail(){
 
     const { productid } = useParams();
 
-    const {products, loading, refreshProducts, refreshCount, user, fetchUserData, token} = useApp()
+    const {products, loading, refreshProducts, refreshCount, user, fetchUserData, token} = useAppUser()
     const {register, handleSubmit, formState : {errors, isSubmitting}, reset} = useForm()
 
 
@@ -36,7 +36,7 @@ export default function ProductDetail(){
             dataForm.append('rug_id', productid)
             dataForm.append('type_tret', IsLikes ? '1' : '0')
 
-            const resp = await apiClient.post('/arwishlist', dataForm, {
+            const resp = await apiClient.post('/user/arwishlist', dataForm, {
                 headers: {Authorization : token}
             })
 
@@ -75,7 +75,7 @@ export default function ProductDetail(){
             dataForm.append('rug_id', productid);
             dataForm.append('rug_Quantity', RugQnt);
 
-            const resp = await apiClient.post('/addcartrug', dataForm, {
+            const resp = await apiClient.post('/user/addcartrug', dataForm, {
                 headers: {Authorization: token}
             });
 

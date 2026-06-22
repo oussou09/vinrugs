@@ -14,7 +14,7 @@ export default function Footer(){
         dataForm.append('email', data.email)
 
         try {
-            const resp = await apiClient.post('/mailnewsletter', dataForm)
+            const resp = await apiClient.post('/user/mailnewsletter', dataForm)
             
             if(resp.status === 200 || resp.status === 201 ){
                 // console.log("SUCCESS:", resp.data);

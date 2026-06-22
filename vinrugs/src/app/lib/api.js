@@ -36,3 +36,32 @@ apiClient.interceptors.request.use(async (config) => {
 }, (error) => {
     return Promise.reject(error);
 });
+
+let isRedirecting = false;
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+
+    const message =
+      error.response?.data?.message ??
+      "The requested page needs a username and a password.";
+
+    if (
+      status === 401 &&
+      !isRedirecting &&
+      typeof window !== "undefined" &&
+      !window.location.pathname.includes("/unauthorized")
+    ) {
+      isRedirecting = true;
+
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+
+      window.location.href = `/unauthorized?message=${encodeURIComponent(message)}`;
+    }
+
+    return Promise.reject(error);
+  }
+);

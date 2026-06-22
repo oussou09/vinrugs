@@ -12,7 +12,8 @@ class ContactUsController extends Controller
                 'full_name' => 'required|string|between:3,60',
                 'email' => 'required|email',
                 'type_problem' => 'required|integer|between:1,4',
-                'problem_description' => 'required|string|between:3,500'
+                'is_read' => 'nullable|integer|between:0,1',
+                'problem_description' => 'required|string|between:3,500',
         ]);
 
         try {

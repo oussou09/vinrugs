@@ -1,7 +1,7 @@
 'use client';
 import Asideprofile from "@/app/(user_group)/asideprofile";
 import { apiClient } from "@/app/lib/api";
-import { useApp } from "@/app/lib/AppContext";
+import { useAppUser } from "@/app/lib/AppContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
@@ -9,10 +9,9 @@ import toast from 'react-hot-toast';
 
 export default function Wishlist(){
 
-    const {user, products, token, refreshProducts, fetchUserData, loadingAuth} = useApp()
+    const {user, products, token, refreshProducts, fetchUserData, loadingAuth} = useAppUser()
     const router = useRouter()
     console.log(user)
-
 
     const list_products = products?.filter((product) =>
                             user?.rugs?.some((rug) => rug.id === product.id)
@@ -29,7 +28,7 @@ export default function Wishlist(){
       dataForm.append('type_tret', 1)
 
       try {
-        const resp = await apiClient.post('/arwishlist', dataForm, {
+        const resp = await apiClient.post('/user/arwishlist', dataForm, {
           headers: {
             Authorization: token
           }

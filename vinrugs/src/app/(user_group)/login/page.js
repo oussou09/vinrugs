@@ -18,7 +18,7 @@ export default function Login(){
             const dataForm = new FormData();
             dataForm.append('email', data.email);
             dataForm.append('password', data.password);
-            const resp = await apiClient.post('/loginuser' , dataForm)
+            const resp = await apiClient.post('/user/loginuser' , dataForm)
             if(resp.status === 200 || resp.status === 201 ){
                 reset()
                 await checkUserLogin(resp.data.access_token)

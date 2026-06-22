@@ -7,7 +7,7 @@ import {
     useElements,
 } from "@stripe/react-stripe-js";
 import { apiClient } from "@/app/lib/api";
-import { useApp } from "@/app/lib/AppContext";
+import { useAppUser } from "@/app/lib/AppContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -20,7 +20,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
     function PaymentForm({ userdata }) {
         const stripe = useStripe();
         const elements = useElements();
-        const { token, refetchUserData, refreshProducts } = useApp();
+        const { token, refetchUserData, refreshProducts } = useAppUser();
         const router = useRouter();
         const [loading, setLoading] = useState(false);
 
@@ -62,7 +62,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
             dataForm.append("card_token",   cardToken.id);
 
 
-            const resp = await apiClient.post("/storeorders", dataForm, {
+            const resp = await apiClient.post("/user/storeorders", dataForm, {
                 headers: { Authorization: token },
             });
 

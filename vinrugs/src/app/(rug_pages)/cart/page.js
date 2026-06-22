@@ -1,6 +1,6 @@
 "use client";
 import { apiClient } from "@/app/lib/api";
-import { useApp } from "@/app/lib/AppContext"
+import { useAppUser } from "@/app/lib/AppContext"
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 export default function Card(){
 
-    const {token, user, loadingAuth, refreshProducts, fetchUserData} = useApp()
+    const {token, user, loadingAuth, refreshProducts, fetchUserData} = useAppUser()
     const {register, handleSubmit, formState : {errors, isSubmitting}, reset} = useForm()
     const [totalPriceRugs, setTotalPriceRugs] = useState(0)
     const [shippinRug, setShippinRug] = useState(0)
@@ -60,7 +60,7 @@ export default function Card(){
             
             try {
                 dataForm.append('rug_id', RugId);
-                const resp = await apiClient.post('/removecartrug', dataForm, {
+                const resp = await apiClient.post('/user/removecartrug', dataForm, {
                     headers:{Authorization:token}
                 });
                 if (resp.status === 200 || resp.status === 201) {

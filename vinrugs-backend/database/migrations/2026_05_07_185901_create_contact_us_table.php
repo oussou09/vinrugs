@@ -16,6 +16,7 @@ return new class extends Migration
             $table->char('full_name');
             $table->string('email');
             $table->integer('type_problem');
+            $table->integer('is_read')->default(0);
             $table->text('problem_description');
             $table->timestamps();
         });

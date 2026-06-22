@@ -2,7 +2,7 @@
 "use client";
 import Asideprofile from '@/app/(user_group)/asideprofile'
 import { apiClient } from '@/app/lib/api';
-import { useApp } from '@/app/lib/AppContext'
+import { useAppUser } from '@/app/lib/AppContext'
 import Link from 'next/link'
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 export default function SecurityPage() {
 
-  const {user, token, fetchUserData} = useApp()
+  const {user, token, fetchUserData} = useAppUser()
   const [Showcard, setShowcard] = useState(false)
 
   console.log(user)

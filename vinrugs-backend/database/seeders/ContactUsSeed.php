@@ -11,6 +11,8 @@ class ContactUsSeed extends Seeder
     {
         $problemTypes = [1, 2, 3, 4];
 
+        $isRead = [0,1];
+
         $descriptions = [
             "I am having trouble logging into my account. The password reset email is not arriving.",
             "My order has been pending for over a week with no updates. Please help.",
@@ -61,6 +63,7 @@ class ContactUsSeed extends Seeder
                 'email'               => $email,
                 'type_problem'        => $problemTypes[array_rand($problemTypes)],
                 'problem_description' => $descriptions[array_rand($descriptions)],
+                'is_read'             => $isRead[array_rand($isRead)],
                 'created_at'          => now()->subDays(rand(0, 90))->subHours(rand(0, 23)),
                 'updated_at'          => now()->subDays(rand(0, 30)),
             ];

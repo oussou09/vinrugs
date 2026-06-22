@@ -2,6 +2,7 @@
 import { apiClient } from "@/app/lib/api";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const AppContextAdmin = createContext();
 
@@ -38,7 +39,14 @@ export default function ({ children }) {
         };
     };
 
-    const clearAdminSession = () => {
+    const clearAdminSession = async () => {
+        const storedToken = localStorage.getItem("admin-token");
+        const resp = await apiClient.post('/admin/logoutadmin',{
+            headers:getAdminHeaders(storedToken)
+        })
+        console.log('logout: ',resp);
+        toast.error(resp.message || 'Something went wrong');
+
         setAdminToken(null);
         setAdminInfos(null);
         localStorage.removeItem("admin-token");
@@ -90,7 +98,7 @@ export default function ({ children }) {
             }
             console.error("Error fetching data ", error);
         } finally {
-            setUsersLoad(false);
+            setAdminInfosLoad(false);
         }
 
     };
@@ -190,7 +198,7 @@ export default function ({ children }) {
     }
     };
 
-    // start fetch contact
+    // start fetch Orders
 
     const fetchOrders = async (AdminAuthToken) => {
         const token = AdminAuthToken || adminToken;
@@ -225,7 +233,7 @@ export default function ({ children }) {
         }
     }
 
-    // end fetch contact
+    // end fetch Orders
 
     // start refetch apis
 

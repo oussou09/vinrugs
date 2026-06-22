@@ -1,12 +1,14 @@
 "use client";
 import Link from "next/link";
-import { useApp } from "@/app/lib/AppContext";
+import { useAppUser } from "@/app/lib/AppContext";
+import { useMemo, useState } from "react";
 
 
 export default function Rugs(){
     
-    const {products, loading, refreshProducts, refreshCount} = useApp()
-    // const allproducts = products.data
+    const {products, loadingProd, refreshProducts, refreshCount} = useAppUser()
+    const [priceSorted, setPriceSorted] = useState("New Arrivals")
+    const [categotySorted, setCategotySorted] = useState("New Arrivals")
     const allproducts = products?.data || products || [];
 
     // console.log("allproducts: ",allproducts)
@@ -24,19 +26,83 @@ export default function Rugs(){
         return `http://127.0.0.1:8000/storage/${firstImage.main_rug_path}`
     }
 
-    const SortBySize = (allsproducts = []) => {
-        return [...allsproducts].sort((a, b) => {
-            const SizeA = a.rug_imges?.[0]?.main_rug_file_size || 0;
-            const SizeB = b.rug_imges?.[0]?.main_rug_file_size || 0;
-            // console.log(SizeB ,"-", SizeA)
-            return SizeB - SizeA;
-        });
+
+    const SortByPrice = (key ,allsproducts = []) => {
+        if (!allsproducts) return []; 
+        switch (key) {
+            case "Low to High":
+
+                return [...allsproducts].sort((a, b) => {
+                    const PriceA = a.rug_price || 0;
+                    const PriceB = b.rug_price || 0;
+                    return PriceA - PriceB;
+                });
+                break;
+
+            case "High to Low":
+            
+                return [...allsproducts].sort((a, b) => {
+                    const PriceA = a.rug_price || 0;
+                    const PriceB = b.rug_price || 0;
+                    return PriceB - PriceA;
+                });
+                break;
+        
+            default:
+                return [...allsproducts].sort((a, b) => {
+                    const SizeA = a.rug_imges?.[0]?.main_rug_file_size || 0;
+                    const SizeB = b.rug_imges?.[0]?.main_rug_file_size || 0;
+                    return SizeB - SizeA;
+                });
+                break;
+        }
+    }
+    
+    // const sortedByPrice = SortByPrice(priceSorted , allproducts)
+    // console.log('SortByPrice: ', sortedByPrice)
+
+    const SortByCategory = (key, sortedByPrice=[]) => {
+        if (!sortedByPrice) return []; 
+        switch (key) {
+            case "Persian":
+                return sortedByPrice.filter((c) => c.rug_category === 1 )
+                break;
+
+                case "Turkish":
+                return sortedByPrice.filter((c) => c.rug_category === 2 )
+                break;
+
+                case "Moroccan":
+                return sortedByPrice.filter((c) => c.rug_category === 3 )
+                break;
+
+                case "Modern":
+                return sortedByPrice.filter((c) => c.rug_category === 4 )
+                break;
+
+            default:
+                return sortedByPrice;
+                break;
+        }
     }
 
-    const sortedRugs = SortBySize(allproducts);
+    // const sortedByCategory = SortByCategory(categotySorted, sortedByPrice);
+
+    const sortedByPrice = useMemo(() => {
+        return SortByPrice(priceSorted , allproducts ?? [])
+    }, [priceSorted, allproducts])
+
+    const sortedByCategory = useMemo(() => {
+        return SortByCategory(categotySorted, sortedByPrice ?? []);
+    }, [categotySorted, sortedByPrice])
+
+    console.log(
+        'sortedByCategory: ', sortedByCategory, "\n",
+        "priceSorted: ", priceSorted, "\n",
+        "categotySorted: ", categotySorted
+    )
 
 
-    // https://dummyjson.com/products
     return (
         // <!-- Rug Gallery Catalog -->
         <section className="pt-12 pb-24 bg-stone-50 min-h-screen font-sans text-stone-900">
@@ -47,7 +113,7 @@ export default function Rugs(){
                     <div>
                         <h1 className="serif text-3xl mb-4">All Rugs</h1>
                         <p className="text-stone-500">
-                        {loading ? "Updating inventory..." : `Browse our master collection of over ${products.length} handcrafted weaving pieces.`}
+                        {loadingProd ? "Updating inventory..." : `Browse our master collection of over ${products.length} handcrafted weaving pieces.`}
                         </p>
                     </div>
                     
@@ -56,11 +122,13 @@ export default function Rugs(){
                             <span className="text-[10px] font-medium uppercase tracking-widest text-stone-400">Sort by Price:</span>
                             <select
                             className="bg-transparent border-none text-xs font-bold py-0 pl-0 focus:ring-0 cursor-pointer text-stone-900 focus:outline-none"
-                            defaultValue="New Arrivals"
+                            name="pricesort"
+                            value={priceSorted}
+                            onChange={(e) => setPriceSorted(e.target.value)}
                             >
                                 <option value="New Arrivals">New Arrivals</option>
-                                <option value="Price: Low to High">Price: Low to High</option>
-                                <option value="Price: High to Low">Price: High to Low</option>
+                                <option value="Low to High">Price: Low to High</option>
+                                <option value="High to Low">Price: High to Low</option>
                             </select>
                         </div>
                         
@@ -68,13 +136,15 @@ export default function Rugs(){
                             <span className="text-[10px] font-medium uppercase tracking-widest text-stone-400">Sort by Category:</span>
                             <select
                             className="bg-transparent border-none text-xs font-bold py-0 pl-0 focus:ring-0 cursor-pointer text-stone-900 focus:outline-none"
-                            defaultValue="New Arrivals"
+                            name="category"
+                            value={categotySorted}
+                            onChange={(e) => setCategotySorted(e.target.value)}
                             >
                                 <option value="New Arrivals">New Arrivals</option>
-                                <option value={1}>Category: Persian</option>
-                                <option value={2}>Category: Turkish</option>
-                                <option value={3}>Category: Moroccan</option>
-                                <option value={4}>Category: Modern</option>
+                                <option value="Persian">Category: Persian</option>
+                                <option value="Turkish">Category: Turkish</option>
+                                <option value="Moroccan">Category: Moroccan</option>
+                                <option value="Modern">Category: Modern</option>
                             </select>
                         </div>
                     </div>
@@ -87,14 +157,16 @@ export default function Rugs(){
 
                 {/* --- Product Grid Container --- */}
                 <div className="grow">
-                    {loading ? (
+                    {loadingProd ?
+                    (
                     /* Loading State Layout */
                     <div className="flex flex-col items-center justify-center py-32 space-y-4">
                         <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-900 rounded-full animate-spin"></div>
                         <p className="text-xs uppercase tracking-widest text-stone-500 animate-pulse">Weaving collection...</p>
                     </div>
-                    ) : sortedRugs.length === 0 ? (
-                    /* Empty Fallback State Layout */
+                    ) : sortedByCategory.length === 0 ? 
+                    (
+                        /* Empty Fallback State Layout */
                         <div className="text-center py-32 border border-dashed border-stone-200">
                             <h3 className="text-base font-medium mb-2">Our Vault is Temporarily Empty</h3>
                             <p className="text-xs text-stone-500 mb-6">Check back soon or hit refresh to pull latest updates.</p>
@@ -109,7 +181,7 @@ export default function Rugs(){
                     /* Active Results Display */
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                        {sortedRugs.map((product) => (
+                        {sortedByCategory.map((product) => (
                             <div key={product.id} className="group">
                             <div className="aspect-[3/4] overflow-hidden bg-stone-100 relative">
                                 <img 

@@ -18,7 +18,7 @@ export default function Contact(){
             dataForm.append('type_problem', parseInt(data.subject))
             dataForm.append('problem_description', data.message)
 
-            const resp = await apiClient.post('/contactus', dataForm);
+            const resp = await apiClient.post('/user/contactus', dataForm);
             if (resp.status === 201 || resp.status ===200) {
                 reset()
                 toast.success(`Mr.${data.name} Your message send successfully, we will contact you`);

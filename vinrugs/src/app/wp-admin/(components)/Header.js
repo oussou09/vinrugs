@@ -4,7 +4,7 @@ import { useAppAdmin } from "../AdminLib/AppContextAdmin"
 // app/admin/Header.js
 export default function Header() {
 
-  const { adminInfos } = useAppAdmin();
+  const { adminInfos, adminInfosLoad } = useAppAdmin();
 
   return (
     <header className="bg-white shadow-sm border-b border-[#eddcc9] h-16 flex items-center justify-between px-4 md:px-6">
@@ -14,12 +14,26 @@ export default function Header() {
         </svg>
       </button>
       <div className="flex-1" />
-      <div className="flex items-center space-x-4">
-        <span className="text-sm text-[#5a3e24] hidden sm:block">Admin ({adminInfos?.fullname})</span>
-        <div className="h-9 w-9 rounded-full bg-[#FFCF71] flex items-center justify-center text-white font-medium">
-          A
+      { adminInfosLoad ?
+      (
+        // Loading skeleton
+        <div className="flex items-center space-x-4 animate-pulse">
+          <div className="h-4 w-28 bg-[#f0e4d3] rounded hidden sm:block" />
+          <div className="h-9 w-9 rounded-full bg-[#f0e4d3]" />
         </div>
-      </div>
+      )
+      :
+      (
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-[#5a3e24] hidden sm:block">Admin ({adminInfos?.fullname})</span>
+          <div className="h-9 w-9 rounded-full bg-[#FFCF71] flex items-center justify-center text-white font-medium">
+            A
+          </div>
+        </div>
+      )
+
+      }
+
     </header>
   )
 }

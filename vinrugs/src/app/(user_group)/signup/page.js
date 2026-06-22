@@ -25,7 +25,7 @@ export default function Signup(){
             dataForm.append('password', data.password)
             dataForm.append('confirm_password', data.confirmPassword)
 
-            const resp = await apiClient.post('/storeuser', dataForm)
+            const resp = await apiClient.post('/user/storeuser', dataForm)
             if(resp.status === 200 || resp.status === 201 ){
                 alert("Your account created successfully!");
                 console.log("SUCCESS:", resp.data);

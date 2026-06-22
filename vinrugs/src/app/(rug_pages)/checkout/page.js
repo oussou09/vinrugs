@@ -1,6 +1,6 @@
 "use client";
 import { apiClient } from "@/app/lib/api";
-import { useApp } from "@/app/lib/AppContext"
+import { useAppUser } from "@/app/lib/AppContext"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,7 @@ import FormCountries from "./formcountries";
 
 export default function Checkout(){
 
-    const {token, user, loadingAuth, refreshProducts, fetchUserData} = useApp()
+    const {token, user, loadingAuth, refreshProducts, fetchUserData} = useAppUser()
     // console.log('token checkout: ',token)
     const {
     register,
@@ -95,7 +95,7 @@ export default function Checkout(){
                 toast.error('Discount is Empty');
                 return;
             }
-            const resp = await apiClient.post('/checkdiscount', {'DiscountCode': discountName},{
+            const resp = await apiClient.post('/user/checkdiscount', {'DiscountCode': discountName},{
                 headers:{Authorization:token},
             })
 

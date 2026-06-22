@@ -20,12 +20,13 @@ export default function Dashboard() {
       setTotalMount(total);
   },[orders])
 
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-[#7B542F]">Dashboard</h1>
       {/* <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-4 gap-4"> */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard title="Total Sales" value={`$${totalMount}`} change="+12.5%" bgColor="bg-[#7B542F]" loading={ordersLoad} />
+        <StatCard title="Total Sales" value={`$${(totalMount ?? 0).toFixed(2)}`} change="+12.5%" bgColor="bg-[#7B542F]" loading={ordersLoad} />
         <StatCard title="Orders" value={ordersCount} change="+8.2%" bgColor="bg-[#B6771D]" loading={ordersLoad} />
         <StatCard title="Products" value={AdProductsCount} change="+2" bgColor="bg-[#FF9D00]" loading={AdProductsLoad} />
         <StatCard title="Customers" value={usersCount} change="+18%" bgColor="bg-[#FFCF71]" loading={usersLoad} />

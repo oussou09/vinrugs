@@ -29,13 +29,13 @@ class UserController extends Controller
             'password' => 'required|min:6|regex:/^(?=.*[a-z])(?=.*[0-9]).+$/i'
         ]);
 
-        if (!Auth::guard('user')->attempt($validationdata)) {
+        if (!Auth::attempt($validationdata)) {
             return response()->json([
                 'message' => 'user ' .$request->email. ' not Found' ,
             ],404);
         }
 
-        $user = Auth::guard('user')->user();
+        $user = Auth::user();
         $token = $user->createToken('user_token', ['user'])->plainTextToken;
 
         return response()->json([
@@ -84,7 +84,8 @@ class UserController extends Controller
             $user = $request->user()->load([
                 'rugs',
                 'ccusers',
-                'cart_shopping.rug.rug_imges'
+                'cart_shopping.rug.rug_imges',
+                'rugs_orders',
             ]);
 
             return response()->json([
@@ -92,6 +93,7 @@ class UserController extends Controller
                 'UserWishRugs' => $user->rugs,
                 'card_user' => $user->ccusers,
                 'cart_shopping' => $user->cart_shopping,
+                'rugs_orders' => $user->rugs_orders,
             ], 200);
 
         } catch (\Throwable $e) {
@@ -185,21 +187,13 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
      * Logout the specified resource.
      */
     public function LogoutUser(Request $request)
     {
         $user = $request->user();
         $user->currentAccessToken()->delete();
-        return response()->json(['message' => "user {$user->first_name} {$user->last_name} Logout seccesfully"]);
+        return response()->json(['message' => "user {$user->first_name} {$user->last_name} Logout seccesfully"],200);
     }
 
     /**

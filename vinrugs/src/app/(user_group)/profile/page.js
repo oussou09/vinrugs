@@ -49,7 +49,7 @@ export default function Profile(){
                                     </div>
                                 </div>
                             )
-                            : !user?.card_user || user.card_user.length === 0 ?
+                            : !user?.rugs_orders || user.rugs_orders.length === 0 ?
                             (
                                 <div className="border border-[#eddcc9] p-8 flex flex-col items-center justify-center gap-4 text-center">
                                     <svg className="w-16 h-16 text-[#d4c4a8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,20 +69,20 @@ export default function Profile(){
                             :
                             (
                                 <>
-                                {user?.card_user?.map((product) => (
-                                    <div key={product.id} className="border border-stone-100 p-8 flex flex-col md:flex-row md:items-center justify-between gap-12">
+                                {user?.rugs_orders?.map((order) => (
+                                    <div key={order.id} className="border border-stone-100 p-8 flex flex-col md:flex-row md:items-center justify-between gap-12">
                                         <div className="flex gap-6">
                                             <div className="w-20 h-24 bg-stone-100 flex-shrink-0">
                                                 <img src="https://images.unsplash.com/photo-1594026112284-02bb6f3352fe?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover grayscale" />
                                             </div>
                                             <div>
-                                                <h3 className="text-xs font-bold uppercase tracking-widest mb-1">Order #RA-1092-B</h3>
+                                                <h3 className="text-xs font-bold uppercase tracking-widest mb-1">Order #NR-{order.id}</h3>
                                                 <p className="text-sm font-medium text-stone-900 mb-2 italic">Isfahan Runner (Large)</p>
-                                                <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-tight px-2 py-1 rounded">Delivered</span>
+                                                <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-tight px-2 py-1 rounded">{order.status}</span>
                                             </div>
                                         </div>
                                         <div className="flex flex-col md:items-end">
-                                            <span className="text-sm font-bold text-stone-900">$1,325.00</span>
+                                            <span className="text-sm font-bold text-stone-900">${order.total_amount}</span>
                                             <span className="text-[10px] text-stone-400 uppercase mt-1">Purchased April 12, 2026</span>
                                             <div className="mt-4 flex space-x-6">
                                                 <button className="text-xs font-bold uppercase tracking-widest underline hover:no-underline transition-soft text-stone-400 hover:text-stone-900">View Detail</button>
