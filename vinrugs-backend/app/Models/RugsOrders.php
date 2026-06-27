@@ -34,4 +34,8 @@ class RugsOrders extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function orders_tracking() {
+        return $this->hasOne(Order_Tracking::class, 'order_id');
+    }
 }
