@@ -40,16 +40,16 @@ export default function ({ children }) {
     };
 
     const clearAdminSession = async () => {
-        const storedToken = localStorage.getItem("admin-token");
-        const resp = await apiClient.post('/admin/logoutadmin',{
-            headers:getAdminHeaders(storedToken)
+        const storedToken = localStorage.getItem('admin-token');
+        const resp = await apiClient.post('/admin/logoutadmin', {}, {
+            headers: getAdminHeaders(storedToken)
         })
         console.log('logout: ',resp);
         toast.error(resp.message || 'Something went wrong');
 
+        localStorage.removeItem('admin-token');
         setAdminToken(null);
         setAdminInfos(null);
-        localStorage.removeItem("admin-token");
         router.push("/wp-admin/login");
     };
 
@@ -255,7 +255,7 @@ export default function ({ children }) {
     };
 
     const refetchOrders = () => {
-        fetchOrders(adminInfos);
+        fetchOrders(adminToken);
     }
 
     // end refetch apis

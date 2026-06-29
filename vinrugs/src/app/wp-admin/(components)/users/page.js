@@ -2,22 +2,21 @@
 import { apiClient } from "@/app/lib/api";
 import { useAppAdmin } from "../../AdminLib/AppContextAdmin"
 import toast from "react-hot-toast";
+import { useState } from "react";
 
 // components/admin/UserManager.js
 export default function UserManager() {
 
-  const {users, usersLoad, adminToken, refetchUsers} = useAppAdmin()
+  const {users, usersLoad, adminToken, refetchUsers} = useAppAdmin();
+  console.log('users from page: ',users);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  console.log('users from page: ',users)
-
-
-  const HandleDelete = async (UserId) => {
-
-    console.log(UserId)
+  const HandleDelete = async () => {
 
     try {
       
-      const resp = await apiClient.post('/admin/deleteuser', {id: UserId},{
+      const resp = await apiClient.post('/admin/deleteuser', {id: selectedUser.id},{
         headers:{
           Authorization : adminToken
         }
@@ -26,6 +25,8 @@ export default function UserManager() {
       if (resp.status === 200) {
         toast.success(resp.data.message);
         await refetchUsers();
+        setIsOpen(false);
+        setSelectedUser(null);
       }
 
     } catch (error) {
@@ -106,7 +107,7 @@ export default function UserManager() {
                   <td className="px-5 py-4"><span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span></td>
                   <td className="px-5 py-4 space-x-2">
                     <button disabled title="Not Allowed Yet" className="text-[#B6771D] hover:text-[#FF9D00] font-medium">Edit</button>
-                    <button onClick={() => HandleDelete(user.id)} className="text-red-500 hover:text-red-700 font-medium">Delete</button>
+                    <button onClick={() => {setIsOpen(true); setSelectedUser(user); }} className="text-red-500 hover:text-red-700 font-medium">Delete</button>
                   </td>
                 </tr>
                 ))}
@@ -115,6 +116,51 @@ export default function UserManager() {
             }
           </tbody>
         </table>
+          {isOpen && selectedUser && (
+            <div
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm"
+            >
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="flex flex-col items-center bg-white shadow-2xl rounded-xl py-6 px-5 md:w-[460px] w-[370px] border border-gray-200"
+              >
+                <div className="flex items-center justify-center p-4 bg-red-100 rounded-full">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M2.875 5.75h1.917m0 0h15.333m-15.333 0v13.417a1.917 1.917 0 0 0 1.916 1.916h9.584a1.917 1.917 0 0 0 1.916-1.916V5.75m-10.541 0V3.833a1.917 1.917 0 0 1 1.916-1.916h3.834a1.917 1.917 0 0 1 1.916 1.916V5.75m-5.75 4.792v5.75m3.834-5.75v5.75"
+                      stroke="#DC2626"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <h2 className="text-gray-900 font-semibold mt-4 text-2xl">Are you sure?</h2>
+                <p className="text-base text-gray-600 mt-2 text-center">
+                  Do you really want to continue? This action<br/> Deleting {selectedUser.first_name} {selectedUser.last_name} id: {selectedUser.id} <br />cannot be undone.
+                </p>
+
+                <div className="flex items-center justify-center gap-4 mt-5 w-full">
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    type="button"
+                    className="w-full md:w-36 h-10 rounded-md border border-gray-300 bg-white text-gray-600 font-medium text-sm hover:bg-gray-100 active:scale-95 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => { HandleDelete(); }}
+                    type="button"
+                    className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 font-medium text-sm hover:bg-red-700 active:scale-95 transition"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
       </div>
     </div>
   )

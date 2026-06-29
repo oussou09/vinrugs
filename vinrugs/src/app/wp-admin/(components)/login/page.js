@@ -5,12 +5,16 @@ import { useForm } from "react-hook-form"
 import toast from "react-hot-toast";
 import { useAppAdmin } from "../../AdminLib/AppContextAdmin";
 import ConfettiBackground from "./ConfettiBackground";
+import { useSearchParams } from "next/navigation";
 
 // app/admin/login/page.js
 export default function AdminLogin() {
 
   const {register, handleSubmit, formState : {errors, isSubmitting}, reset} = useForm();
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const reason = searchParams.get("reason");
 
   const {CheckAdminLogin} = useAppAdmin()
 
@@ -25,8 +29,9 @@ export default function AdminLogin() {
       const resp = await apiClient.post('/admin/loginadmin' , dataForm);
       if (resp.status === 200) {
         reset();
-        // console.log(resp.data.token)
-        await CheckAdminLogin(resp.data.token, resp.data.admin);
+        // console.log(resp.data.token), resp.data.admin
+        await CheckAdminLogin(resp.data.token);
+        console.log('token login: ', resp.data.token)
         router.push('/wp-admin/dashboard');
         toast.success('Login successfully');
       }
@@ -57,6 +62,12 @@ export default function AdminLogin() {
               <h1 className="text-3xl font-bold text-[#7B542F]">VintageRugs</h1>
               <p className="text-[#B6771D] text-sm mt-1 uppercase tracking-widest font-medium">Admin Panel</p>
             </div>
+
+            {reason === "expired" && (
+              <p className="text-red-600 text-sm mb-4">
+                Your session has expired. Please log in again.
+              </p>
+            )}
 
             {/* Login Form */}
             <div className="bg-white rounded-2xl shadow-xl border border-[#eddcc9] p-8">

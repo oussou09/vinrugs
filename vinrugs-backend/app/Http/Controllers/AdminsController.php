@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admins;
+use App\Models\Order_Tracking;
 use App\Models\OrderItems;
 use App\Models\Rugs;
 use App\Models\Rugs_imges;
@@ -39,12 +40,19 @@ class AdminsController extends Controller
 
     }
 
-    public function LogoutAdmin(Request $request) {
+    public function LogoutAdmin(Request $request)
+    {
+        $admin = Auth::guard('sanctum')->user() ?? $request->user();
 
-        $admin = Auth::guard('admin')->user();
+        if (!$admin) {
+            return response()->json(['message' => 'Already logged out.'], 200);
+        }
+
         $admin->currentAccessToken()->delete();
-        return response()->json(['message' => "admin {$admin->fullname} Logout seccesfully"],200);
 
+        return response()->json([
+            'message' => "Admin {$admin->fullname} logged out successfully."
+        ], 200);
     }
 
     public function AdminInfos(Request $request)
@@ -81,7 +89,7 @@ class AdminsController extends Controller
     }
 
     public function GetOrders() {
-        $orders = RugsOrders::with('order_items.rug')->get();
+        $orders = RugsOrders::with(['order_items.rug', 'orders_tracking'])->get();
 
         return response()->json([
             'orders' => $orders
@@ -134,7 +142,7 @@ class AdminsController extends Controller
         //     'rug_id' => $validator['id'],
         // ]);
 
-        $rug->delete();
+        // $rug->delete();
 
         return response()->json([
             'message' => "rug {$rug->rug_title} deleted successfully"
@@ -142,7 +150,41 @@ class AdminsController extends Controller
 
     }
 
+    public function OrderTracking(Request $request) {
 
+        // Log::info($request);
+        Log::info('Token received: ' . $request->header('Authorization'));
+        Log::info('User: ', [$request->user()]);
+
+        $validated = $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'delivery_companies' => 'required|integer|between:1,3',
+            'tracking_number' => 'required'
+        ]);
+
+        $trackingData = [
+            'order_id' => $validated['order_id'],
+            'delivery_companies' => $validated['delivery_companies'],
+            'tracking_number' => $validated['tracking_number'],
+        ];
+
+        try {
+
+            Order_Tracking::create($trackingData);
+
+            $RugSelected = RugsOrders::findOrFail($validated['order_id']);
+
+            Log::info($RugSelected);
+            $RugSelected->update([
+                'status' => 'shipped'
+            ]);
+            return response()->json([
+                'message' => 'the traking stored seccesfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Something went wrong while saving : ' . $e->getMessage()], 500);
+        }
+    }
 
 
 

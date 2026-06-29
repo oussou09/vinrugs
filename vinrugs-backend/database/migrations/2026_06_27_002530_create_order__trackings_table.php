@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('order_trackings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
-            $table->decimal('delivery_companies');
+            $table->integer('delivery_companies');
             $table->text('tracking_number');
             $table->timestamps();
         });

@@ -63,7 +63,7 @@ export default function ContactReply() {
                   </h3>
                   <p className="text-sm text-gray-500">from {contact.full_name} ({contact.email}) • {contact.created_at?.split("T")[0]} {contact.created_at?.split("T")[1]?.split(".")[0]} ago</p>
                 </div>
-                <span className={`text-xs ${contact.is_read === 0 ? "text-[#000000] bg-[#fdf6ec]" : "text-[#000000] bg-[#96e296]"} px-2 py-1 rounded-full mt-1 sm:mt-0`}>{contact.is_read === 0 ? "Unread" : contact.is_read === 1 ? "Read" : null}</span>
+                <span className={`text-xs ${contact.is_read === 0 ? "text-[#000000] bg-[#fdf6ec]" : "text-[#000000] bg-[#96e296]"} px-2 py-1 rounded-full mt-1 sm:mt-0`}>{contact.is_read === 0 ? "Unread" : contact.is_read === 1 ? "Read (Replyed)" : null}</span>
               </div>
               <p className="text-sm text-gray-700 mb-4">{contact.problem_description}...</p>
               <div className="flex space-x-3">

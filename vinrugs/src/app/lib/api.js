@@ -43,23 +43,41 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
+    const message = error.response?.data?.message ?? "";
 
-    const message =
-      error.response?.data?.message ??
-      "The requested page needs a username and a password.";
+    if (isRedirecting || typeof window === "undefined") {
+      return Promise.reject(error);
+    }
 
-    if (
+    const currentPath = window.location.pathname;
+
+    // Don't redirect if already on login or unauthorized page
+    const isSafePage =
+      currentPath.includes("/wp-admin/login") ||
+      currentPath.includes("/unauthorized");
+
+    if (isSafePage) {
+      return Promise.reject(error); // ← stop here, no redirect
+    }
+
+    const isExpired =
       status === 401 &&
-      !isRedirecting &&
-      typeof window !== "undefined" &&
-      !window.location.pathname.includes("/unauthorized")
-    ) {
-      isRedirecting = true;
+      (message === "Unauthenticated." ||
+        message.toLowerCase().includes("expired") ||
+        message.toLowerCase().includes("unauthenticated"));
 
+    const isForbidden = status === 403;
+
+    if (isExpired) {
+      isRedirecting = true;
       localStorage.removeItem("admin_token");
       localStorage.removeItem("admin_user");
-
-      window.location.href = `/unauthorized?message=${encodeURIComponent(message)}`;
+      window.location.href = "/wp-admin/login?reason=expired";
+    } else if (isForbidden) {
+      isRedirecting = true;
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+      window.location.href = "/unauthorized";
     }
 
     return Promise.reject(error);

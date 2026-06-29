@@ -1,11 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 export default function UnauthorizedPage() {
-  const searchParams = useSearchParams();
-  const message = searchParams.get('message') || 'You do not have permission to view this page.';
 
   return (
     <main className="min-h-[80vh] flex items-center justify-center px-4 py-16 bg-stone-50">

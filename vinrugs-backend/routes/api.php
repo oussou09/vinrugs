@@ -56,6 +56,7 @@ Route::prefix('admin')->group(function () {
 
         Route::post('/deleteuser', [AdminsController::class, 'DeleteUser']);
         Route::post('/deleterug', [AdminsController::class, 'DeleteRug']);
+        Route::post('/tracking', [AdminsController::class, 'OrderTracking']);
     });
 
 });

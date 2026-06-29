@@ -95,18 +95,17 @@ export function AppProvider({ children }) {
     const checkLogout = async () => {
         const storedToken = localStorage.getItem('token');
 
-        await apiClient.post('/user/logoutuser', {
+        await apiClient.post('/user/logoutuser', {}, {
             headers: {
-                Authorization:storedToken,
-            }
+                Authorization: storedToken,
+            },
         })
 
-        localStorage.removeItem("token");
+        localStorage.removeItem('token');
         setToken(null);
         setUser(null);
+        return router.push('/login');
     };
-
-
     return (
         <AppContext.Provider value={{ products, setProducts, loadingProd,
                                       cart, setCart,
